@@ -1,0 +1,33 @@
+---
+interface Props {
+  tone?: 'soft' | 'info';
+}
+
+const { tone = 'soft' } = Astro.props;
+---
+
+<aside class:list={['mascot-bubble', `mascot-bubble-${tone}`]}>
+  <slot />
+</aside>
+
+<style>
+  .mascot-bubble {
+    position: relative;
+    border: 1px solid var(--color-line);
+    border-radius: 18px 18px 18px 6px;
+    padding: 0.9rem 1rem;
+    color: var(--color-text);
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.65;
+    box-shadow: var(--shadow-card);
+  }
+
+  .mascot-bubble-soft {
+    background: color-mix(in srgb, var(--color-pink) 14%, white);
+  }
+
+  .mascot-bubble-info {
+    background: color-mix(in srgb, var(--color-blue) 14%, white);
+  }
+</style>
