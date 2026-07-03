@@ -1,0 +1,54 @@
+<aside class="collection-corner anime-frame">
+  <span>Small Collection</span>
+  <h3>小小收藏室</h3>
+  <p>这里会放一些番剧、音乐、游戏和日常碎片，先作为站点里的轻量角落。</p>
+  <div class="chips">
+    <b>番剧记录</b>
+    <b>音乐循环</b>
+    <b>游戏碎片</b>
+  </div>
+</aside>
+
+<style>
+  .collection-corner {
+    border-radius: var(--radius-lg);
+    padding: 1.2rem;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--color-pink) 16%, white), color-mix(in srgb, var(--color-blue) 10%, white));
+  }
+
+  span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    margin: 0.55rem 0 0.55rem;
+    color: var(--color-text);
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-muted);
+    line-height: 1.7;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  b {
+    border-radius: 999px;
+    padding: 0.28rem 0.58rem;
+    background: rgba(255, 255, 255, 0.68);
+    color: var(--color-text);
+    font-size: 0.8rem;
+  }
+</style>
