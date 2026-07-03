@@ -1,0 +1,32 @@
+:root {
+  --color-bg: #fff8f0;
+  --color-surface: #ffffff;
+  --color-paper: #fffdf8;
+  --color-text: #25314a;
+  --color-muted: #68738f;
+  --color-line: #eadfce;
+  --color-blue: #7ebfff;
+  --color-pink: #ffb1c9;
+  --color-gold: #e7b75f;
+  --color-cyan: #77d7dd;
+  --shadow-soft: 0 18px 45px rgba(64, 57, 45, 0.12);
+  --shadow-card: 0 12px 28px rgba(64, 57, 45, 0.09);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+.anime-frame {
+  border: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-paper) 92%, white);
+  box-shadow: var(--shadow-card);
+}
+
+.desk-grid {
+  background-image:
+    linear-gradient(rgba(126, 191, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(126, 191, 255, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 620" role="img" aria-labelledby="title desc">
+  <title id="title">站点看板娘占位图</title>
+  <desc id="desc">浅色二次元风格的原创看板娘占位插画。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#ffffff" offset="0"/>
+      <stop stop-color="#ffeaf1" offset="0.55"/>
+      <stop stop-color="#eaf6ff" offset="1"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#445875" offset="0"/>
+      <stop stop-color="#6f8db7" offset="1"/>
+    </linearGradient>
+  </defs>
+  <rect x="18" y="18" width="484" height="584" rx="38" fill="url(#bg)" stroke="#eadfce" stroke-width="6"/>
+  <path d="M70 500c74 48 285 58 380-12" fill="none" stroke="#7ebfff" stroke-width="8" stroke-linecap="round" opacity=".38"/>
+  <circle cx="260" cy="210" r="108" fill="#ffd9c8"/>
+  <path d="M156 216c12-86 62-132 128-126 70 6 110 62 104 147-42-16-84-38-118-88-32 48-70 73-114 67Z" fill="url(#hair)"/>
+  <path d="M160 210c2-79 46-136 115-142 69-6 120 49 126 125 4 57-13 105-31 139-26-4-41-19-49-42 20-22 35-58 31-96-4-43-29-78-80-80-50-2-79 31-84 75-4 43 13 77 35 101-8 24-24 38-49 42-15-32-17-69-14-122Z" fill="url(#hair)"/>
+  <circle cx="224" cy="222" r="9" fill="#25314a"/>
+  <circle cx="300" cy="222" r="9" fill="#25314a"/>
+  <path d="M239 262c18 12 39 12 58 0" fill="none" stroke="#a76678" stroke-width="7" stroke-linecap="round"/>
+  <path d="M158 554c14-104 62-166 104-166s91 62 105 166H158Z" fill="#fffdf8" stroke="#eadfce" stroke-width="6"/>
+  <path d="M203 401l57 68 59-68" fill="none" stroke="#7ebfff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="71" y="76" width="126" height="54" rx="22" fill="#fffdf8" stroke="#eadfce" stroke-width="4"/>
+  <path d="M94 104h76" stroke="#ffb1c9" stroke-width="8" stroke-linecap="round"/>
+  <path d="M390 128h48M414 104v48" stroke="#e7b75f" stroke-width="8" stroke-linecap="round"/>
+  <path d="M82 400h74M119 363v74" stroke="#77d7dd" stroke-width="7" stroke-linecap="round" opacity=".65"/>
+</svg>
