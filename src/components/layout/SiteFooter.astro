@@ -1,0 +1,50 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div>
+    <span>Desk Log / {year}</span>
+    <p>项目档案、开发日志和一点二次元收藏。</p>
+  </div>
+  <a href="/">返回开发书桌</a>
+</footer>
+
+<style>
+  .site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: min(1120px, calc(100% - 2rem));
+    margin: 3rem auto 2rem;
+    border-top: 1px solid var(--color-line);
+    padding-top: 1.4rem;
+    color: var(--color-muted);
+  }
+
+  span {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  p {
+    margin: 0.25rem 0 0;
+  }
+
+  a {
+    color: var(--color-text);
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  @media (max-width: 680px) {
+    .site-footer {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+</style>

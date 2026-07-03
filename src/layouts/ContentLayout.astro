@@ -1,0 +1,93 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageShell from '@/components/layout/PageShell.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  date?: Date;
+}
+
+const { title, description, date } = Astro.props;
+const dateText = date
+  ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'long' }).format(date)
+  : '';
+---
+
+<BaseLayout title={`${title} | 开发书桌`} description={description}>
+  <PageShell narrow>
+    <article class="content-layout anime-frame">
+      <header>
+        <span>Log Entry</span>
+        <h1>{title}</h1>
+        {dateText && <time>{dateText}</time>}
+        <p>{description}</p>
+      </header>
+      <div class="prose">
+        <slot />
+      </div>
+    </article>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .content-layout {
+    border-radius: var(--radius-lg);
+    padding: clamp(1.3rem, 4vw, 2.4rem);
+  }
+
+  header {
+    border-bottom: 1px solid var(--color-line);
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0.65rem 0;
+    color: var(--color-text);
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.08;
+  }
+
+  time,
+  header p {
+    color: var(--color-muted);
+  }
+
+  header p {
+    max-width: 42rem;
+    margin: 0.8rem 0 0;
+    line-height: 1.8;
+  }
+
+  .prose {
+    color: var(--color-text);
+    font-size: 1.02rem;
+    line-height: 1.9;
+  }
+
+  .prose :global(h2) {
+    margin-top: 2rem;
+    color: var(--color-text);
+  }
+
+  .prose :global(a) {
+    color: color-mix(in srgb, var(--color-blue) 72%, var(--color-text));
+    font-weight: 800;
+  }
+
+  .prose :global(code) {
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-blue) 12%, white);
+    padding: 0.1rem 0.32rem;
+  }
+</style>

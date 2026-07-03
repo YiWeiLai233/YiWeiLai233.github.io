@@ -1,0 +1,45 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageShell from '@/components/layout/PageShell.astro';
+import { site } from '@/data/site';
+---
+
+<BaseLayout>
+  <PageShell>
+    <section class="placeholder anime-frame">
+      <span>Guide Menu / Developer Desk</span>
+      <h1>{site.hero.title}</h1>
+      <p>{site.hero.subtitle}</p>
+    </section>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .placeholder {
+    border-radius: var(--radius-lg);
+    padding: clamp(1.4rem, 5vw, 4rem);
+  }
+
+  span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    max-width: 48rem;
+    margin: 1rem 0;
+    color: var(--color-text);
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    line-height: 1.02;
+  }
+
+  p {
+    max-width: 40rem;
+    color: var(--color-muted);
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+</style>

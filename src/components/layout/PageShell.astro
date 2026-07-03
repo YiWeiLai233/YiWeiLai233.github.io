@@ -1,0 +1,23 @@
+---
+interface Props {
+  narrow?: boolean;
+}
+
+const { narrow = false } = Astro.props;
+---
+
+<div class:list={['page-shell', narrow && 'page-shell-narrow']}>
+  <slot />
+</div>
+
+<style>
+  .page-shell {
+    width: min(1120px, calc(100% - 2rem));
+    margin: 0 auto;
+    padding: 2rem 0 4rem;
+  }
+
+  .page-shell-narrow {
+    width: min(780px, calc(100% - 2rem));
+  }
+</style>
