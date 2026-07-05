@@ -1,0 +1,169 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageShell from '@/components/layout/PageShell.astro';
+import PageVisualHero from '@/components/feature/PageVisualHero.astro';
+import MiniGuideCard from '@/components/feature/MiniGuideCard.astro';
+import ChapterMascot from '@/components/feature/ChapterMascot.astro';
+import ArchiveFrame from '@/components/ui/ArchiveFrame.astro';
+import MascotBubble from '@/components/ui/MascotBubble.astro';
+---
+
+<BaseLayout title="站点档案 | 未来观测站" description="未来观测站的定位、内容结构和维护方式说明。">
+  <PageShell>
+    <PageVisualHero
+      title="站点档案"
+      subtitle="未来观测站是忆丶未来的个人博客，集中整理开发项目、技术日志、二次元收藏和日常记录。"
+      image="/assets/hero-about.png"
+      alt="看板娘正在介绍站点档案和个人资料"
+    />
+    <div class="about-note">
+      <MascotBubble tone="info">当前站点采用静态内容维护：文章和项目保存在仓库中，构建后发布到线上。</MascotBubble>
+    </div>
+
+    <div class="about-grid">
+      <section>
+        <ChapterMascot
+          chapter="档案"
+          title="站点内容结构"
+          subtitle="它以开发记录为主线，同时保留个人兴趣和日常观察。"
+          variant="about"
+        />
+        <div class="profile-list">
+          <ArchiveFrame label="项目档案">
+            <h2>项目档案</h2>
+            <p>归档开发项目的目标、状态、技术栈和复盘入口。</p>
+          </ArchiveFrame>
+          <ArchiveFrame label="开发日志">
+            <h2>开发日志</h2>
+            <p>沉淀技术笔记、实现过程、问题排查和阶段复盘。</p>
+          </ArchiveFrame>
+          <ArchiveFrame label="兴趣收藏">
+            <h2>兴趣收藏</h2>
+            <p>整理番剧、音乐、游戏和日常灵感，补足站点的个人面。</p>
+          </ArchiveFrame>
+          <ArchiveFrame label="观测收藏">
+            <h2>观测收藏</h2>
+            <p>用统一的卡片结构管理兴趣分类，并在首页和收藏页同步展示。</p>
+          </ArchiveFrame>
+        </div>
+      </section>
+
+      <aside class="about-side">
+        <MiniGuideCard
+          title="站点说明"
+          text="站点档案用于说明内容定位、维护方式和扩展方向。"
+        />
+        <div class="maintain-card anime-frame">
+          <span>维护方式</span>
+          <h2>维护方式</h2>
+          <p>站点暂不设置登录后台。文章与项目通过内容目录维护，更新文件后重新构建发布。</p>
+          <dl>
+            <div>
+              <dt>文章目录</dt>
+              <dd>src/content/posts</dd>
+            </div>
+            <div>
+              <dt>项目目录</dt>
+              <dd>src/content/projects</dd>
+            </div>
+            <div>
+              <dt>样式入口</dt>
+              <dd>src/styles/theme.css</dd>
+            </div>
+          </dl>
+        </div>
+      </aside>
+    </div>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .about-note {
+    width: min(40rem, 100%);
+    margin: -0.8rem 0 2rem;
+  }
+
+  .maintain-card > span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .profile-list p,
+  .maintain-card p,
+  dd {
+    margin: 0;
+    color: var(--color-muted);
+    line-height: 1.8;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 21rem);
+    gap: clamp(1rem, 2vw, 1.5rem);
+    align-items: start;
+  }
+
+  .profile-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .about-side {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .profile-list h2,
+  .maintain-card h2 {
+    margin: 0 0 0.65rem;
+    color: var(--color-text);
+    font-size: 1.12rem;
+  }
+
+  .maintain-card {
+    border-radius: var(--radius-lg);
+    padding: 1.2rem;
+  }
+
+  dl {
+    display: grid;
+    gap: 0.8rem;
+    margin: 1rem 0 0;
+  }
+
+  dt {
+    color: var(--color-text);
+    font-weight: 800;
+  }
+
+  dd {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 900px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .about-side {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .profile-list {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .about-side {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

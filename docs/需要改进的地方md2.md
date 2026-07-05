@@ -1,0 +1,134 @@
+第三方登录
+
+控制台管理页面✅️
+
+![image-20260519235438541](../image-20260519235438541.png)
+
+手机使用的时候不会自动刷新ai解析不会出结果✅️
+
+个人资料里面的邮箱和用户名改成不能更改✅️
+
+cicd 项目容器化 普罗米修斯监控 队列 springcloud 
+
+redis 做邮箱验证码✅️
+
+redis没有密码设置密码
+
+管理员页面的分页改成首页上一页123…6下一页面尾页✅️
+
+在启动的时候检测一下ai池的延迟✅️
+
+需要一个参数来制定图片分析用哪个ai✅️
+
+检测ai分析失败的时候要可以重新分析
+
+ai资源池自检测试延迟(心跳机制)	
+
+要加上ai解析 的免责说明✅️
+
+头像存储用分布式存储✅️
+
+- 密码加密：BCrypt✅️
+
+- 支付模块单独成立(心跳机制)
+
+  游客也可以查看自己的梦境列表
+
+  系统安全问题
+
+  负载均衡  了解百万级用户负载
+
+用户上传手绘图片分析✅️
+
+手机的管理员ui还要适配✅️
+
+深夜模式适配ui✅️
+
+
+
+在多个梦境一起解析的时候容易出现解析不完全的问题!!!!!✅️token给少了
+
+设置一个超级管理员首次注册账号就是超级管理员无法被编辑✅️
+
+在登陆的时候返回login页面可以重复登录的bug✅️
+
+15分钟不操作自动退出✅️
+
+oauth接口
+
+多ai接口 同个ai多个ai账户分配不同的账号✅️
+
+ALTER TABLE dream_content ADD COLUMN image_url VARCHAR(500) DEFAULT NULL; 要在数据库上面运行✅️
+
+好，先不盯“保存失败”这个点。我把整个项目按优先级梳理成一张改进清单，方便你后面分阶段做。
+
+**最高优先级**
+
+1. **中文内容存在明显乱码**
+   多个后端返回文案、前端页面文案、SQL 注释都已经变成乱码。比如 RecordDreamView.vue (line 13)、DreamController.java (line 42)、dreamStatsMapper.xml (line 8)。这会直接影响用户体验，也会让维护变痛苦。建议统一 UTF-8 修复文本。
+2. **文档说已改 BCrypt，但代码仍是 SHA-256+盐**
+   PasswordEncrypt.java (line 17) 仍是 SHA-256。建议改成 Spring Security 的 BCryptPasswordEncoder，并做旧密码兼容迁移。✅️
+3. **Token 密钥有默认值**
+   TokenService.java (line 18) 默认 dev-only-change-me。生产环境如果忘配会很危险。建议未配置强密钥时直接启动失败。✅️
+4. **大量接口用 Map<String, Object> 接收入参**
+   如 DreamController.java (line 46)、LoginController.java (line 25)。建议改 DTO + Bean Validation，这样字段校验、错误提示、接口文档都会清晰很多。
+5. **权限判断里有 Integer == 比较**
+   这不只影响保存，也影响列表、统计、用户信息、管理员自我保护逻辑。建议全项目统一改 Objects.equals。
+
+**安全改进**
+
+1. **Token 存 localStorage，有 XSS 后被盗风险**
+   stores/index.ts (line 33) 使用 localStorage 保存 token。短期加 CSP、严格禁止 v-html；长期建议改 HttpOnly Cookie。❗️后续还要更新❗️
+2. **错误信息会把异常细节返回给用户**
+   如 GlobalExceptionHandler.java (line 21)、DreamController.java (line 156)。建议前端只显示友好文案，详细错误写日志。✅️
+3. **验证码随机数建议换 SecureRandom**
+   VerificationCodeService.java (line 18) 用的是 Random。验证码、安全口令相关建议用 SecureRandom。✅️
+4. **登录、验证码校验、游客 AI 接口需要更强限流**
+   现在验证码发送有限流，但登录失败、验证码错误尝试、重置密码尝试、游客接口都还可以更细：按 IP + 邮箱 + 设备 ID 限制。
+5. **Swagger 生产环境应关闭或加权限**
+   SecurityPaths.java (line 13) 把 Swagger 公开了。上线后建议按 profile 控制。
+
+**后端架构**
+
+1. **数据库迁移缺少版本化工具**
+   现在是散落 SQL 文件和 dream.sql。建议引入 Flyway 或 Liquibase，管理每次表结构变化。
+2. **旧代码清理还没完全同步**
+   Git 状态显示旧 DTO、Mapper、Controller 已删除但未整理提交；文档里也有“仍可删除”。建议做一次遗留代码清理专项。
+3. **统计系统建议做重建任务**
+   统计表是预计算的，一旦历史数据、删除、同步、异常中断，容易不一致。建议增加管理员“一键重建统计”接口或定时任务。
+4. **AI 任务状态应字段化**
+   现在前端靠解析文案判断“解析中”。建议 dream_content 增加 analysis_status、analysis_error，比如 PENDING/SUCCESS/FAILED。✅️
+5. **AdminService 内部又手动验 token**
+   Spring Security 已经做了认证，AdminService 里还解析 Authorization，重复且容易不一致。建议改成从 SecurityContext 取当前用户。
+
+**前端体验**
+
+1. **保存/登录/同步失败提示太笼统**
+   现在很多地方只提示“失败，请重试”。建议区分登录过期、网络超时、字段过长、权限不足、服务异常。
+2. **表单缺少统一校验规则**
+   梦境标题、内容、地点、用户名、邮箱、密码强度建议前后端统一规则，避免前端可提交但后端失败。
+3. **游客同步缺少可见反馈**
+   登录后 syncGuestDreams 静默执行。建议告诉用户“已同步 X 条，失败 Y 条”，并允许重试失败项。
+4. **路由守卫依赖本地 role**
+   前端 role 来自 localStorage，可以被改。虽然后端会拦，但前端页面可能短暂误显示。建议进入 /admin 时拉一次服务端身份确认。
+5. **缺少全局通知组件**
+   现在大量 alert。建议做统一 Toast/Modal，体验会立刻提升一档。
+
+**工程质量**
+
+1. **测试基本缺失**
+   mvn test 能过，但 src/test 主要是 main 脚本，不是真正单元/集成测试。建议优先补：注册登录、权限隔离、梦境 CRUD、统计、游客同步、AI 失败降级。
+2. **依赖有冗余**
+   pom.xml (line 28) 同时有 Unirest、OkHttp、Java HttpClient 风格，目前 AI 实际用 Java HttpClient。建议删不用的依赖，降低安全和维护成本。
+3. **配置有重复**
+   CORS 在 SecurityConfig.java (line 75) 和 WebConfig.java (line 17) 都配了。建议保留一处，避免后续改漏。✅️
+4. **本地构建环境需要整理**
+   Maven wrapper 当前不可用，我用本机 Maven 才编译成功。建议修复 wrapper，保证换机器也能一键构建。
+5. **文档和代码有偏差**
+   AGENTS/CLAUDE 写了 BCrypt、旧代码状态等，但代码实际不完全一致。建议把“现状”和“计划”分开，避免后续判断失真。✅️
+
+我建议你的改进顺序是：**先修乱码和安全基础，再做 DTO 校验和权限比较，再整理数据库迁移和测试，最后优化 AI 状态、游客同步、统计重建这些体验功能。**
+
+GitHub Actions搭建CICD
+
+在管理员界面添加ai资源池 dashboard 的增删改查provider

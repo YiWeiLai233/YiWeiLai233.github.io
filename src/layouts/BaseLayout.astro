@@ -2,6 +2,8 @@
 import '@/styles/global.css';
 import SiteFooter from '@/components/layout/SiteFooter.astro';
 import SiteHeader from '@/components/layout/SiteHeader.astro';
+import QuestWidget from '@/components/islands/QuestWidget.vue';
+import { site } from '@/data/site';
 
 interface Props {
   title?: string;
@@ -9,8 +11,8 @@ interface Props {
 }
 
 const {
-  title = '开发书桌',
-  description = '项目档案、开发日志和一点二次元收藏。'
+  title = site.name,
+  description = `${site.owner} 的项目档案、开发日志和二次元收藏。`
 } = Astro.props;
 ---
 
@@ -28,5 +30,6 @@ const {
       <slot />
     </main>
     <SiteFooter />
+    <QuestWidget client:load />
   </body>
 </html>

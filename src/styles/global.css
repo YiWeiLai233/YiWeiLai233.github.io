@@ -15,11 +15,29 @@ body {
   margin: 0;
   font-family: var(--font-sans);
   background:
-    radial-gradient(circle at top left, rgba(126, 191, 255, 0.18), transparent 34rem),
-    radial-gradient(circle at top right, rgba(255, 177, 201, 0.18), transparent 30rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), transparent 18rem),
+    radial-gradient(circle at top left, rgba(100, 181, 246, 0.18), transparent 34rem),
+    radial-gradient(circle at top right, rgba(121, 220, 233, 0.16), transparent 30rem),
+    radial-gradient(circle at 72% 18%, rgba(255, 165, 189, 0.13), transparent 22rem),
     var(--color-bg);
+}
+
+body > main,
+body > footer,
+.site-header {
+  position: relative;
+  z-index: 1;
 }
 
 * {
   box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-pink) 34%, white);
+  color: var(--color-text);
 }

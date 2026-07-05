@@ -12,9 +12,9 @@ const { narrow = false } = Astro.props;
 
 <style>
   .page-shell {
-    width: min(1120px, calc(100% - 2rem));
+    width: min(1180px, calc(100% - clamp(2rem, 5vw, 5rem)));
     margin: 0 auto;
-    padding: 2rem 0 4rem;
+    padding: clamp(1.4rem, 2.4vw, 2.2rem) 0 4rem;
   }
 
   .page-shell-narrow {

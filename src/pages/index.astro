@@ -1,45 +1,218 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageShell from '@/components/layout/PageShell.astro';
-import { site } from '@/data/site';
+import HeroSection from '@/components/feature/HeroSection.astro';
+import ProjectCard from '@/components/feature/ProjectCard.astro';
+import PostCard from '@/components/feature/PostCard.astro';
+import SkillPanel from '@/components/feature/SkillPanel.astro';
+import CollectionCorner from '@/components/feature/CollectionCorner.astro';
+import MiniGuideCard from '@/components/feature/MiniGuideCard.astro';
+import ChapterMascot from '@/components/feature/ChapterMascot.astro';
+import ObservationCard from '@/components/feature/ObservationCard.astro';
+import MascotTheater from '@/components/feature/MascotTheater.astro';
+import ArchiveFrame from '@/components/ui/ArchiveFrame.astro';
+import Button from '@/components/ui/Button.astro';
+import { observations } from '@/data/observations';
+import { getEntrySlug, getPostHref, getProjectHref, sortPostsByDateDesc, sortProjectsByPriority } from '@/lib/content';
+
+const posts = sortPostsByDateDesc(await getCollection('posts', ({ data }) => !data.draft)).slice(0, 3);
+const projects = sortProjectsByPriority(await getCollection('projects')).slice(0, 3);
+const featuredObservations = observations.slice(0, 3);
 ---
 
-<BaseLayout>
+<BaseLayout title="未来观测站 | 忆丶未来的二次元个人站">
+  <HeroSection />
   <PageShell>
-    <section class="placeholder anime-frame">
-      <span>Guide Menu / Developer Desk</span>
-      <h1>{site.hero.title}</h1>
-      <p>{site.hero.subtitle}</p>
-    </section>
+    <div class="home-grid">
+      <div class="home-main">
+        <section class="home-section">
+          <ChapterMascot
+            chapter="项目"
+            title="项目档案"
+            subtitle="记录项目目标、实现过程、技术栈与长期维护状态。"
+            variant="projects"
+          />
+          <div class="project-grid">
+            {
+              projects.map((project) => (
+                <div id={getEntrySlug(project.id)}>
+                  <ProjectCard
+                    title={project.data.title}
+                    summary={project.data.summary}
+                    status={project.data.status}
+                    stack={project.data.stack}
+                    href={getProjectHref(project)}
+                    repo={project.data.repo}
+                    demo={project.data.demo}
+                  />
+                </div>
+              ))
+            }
+          </div>
+        </section>
+
+        <section class="home-section">
+          <ChapterMascot
+            chapter="收藏"
+            title="二次元观测区"
+            subtitle="整理番剧、游戏、音乐和日常灵感，让兴趣内容成为站点的一部分。"
+            variant="home"
+          />
+          <div class="observation-grid">
+            {featuredObservations.map((item) => <ObservationCard item={item} compact />)}
+          </div>
+          <div class="section-actions">
+            <Button href="/collections/" variant="secondary">进入观测收藏</Button>
+          </div>
+        </section>
+
+        <section class="home-section">
+          <ChapterMascot
+            chapter="日志"
+            title="开发日志"
+            subtitle="沉淀技术选择、问题排查、迭代记录和阶段复盘。"
+            variant="logs"
+          />
+          <div class="post-list">
+            {
+              posts.map((post) => (
+                <PostCard
+                  title={post.data.title}
+                  summary={post.data.summary}
+                  date={post.data.date}
+                  tags={post.data.tags}
+                  href={getPostHref(post)}
+                />
+              ))
+            }
+          </div>
+        </section>
+
+        <MascotTheater />
+      </div>
+
+      <aside class="home-side">
+        <MiniGuideCard
+          title="观测站指南"
+          text="首页以主图建立站点氛围，项目、日志和收藏模块负责承载主要内容。"
+        />
+        <ArchiveFrame label="今日路线">
+          <h3>今日查看路线</h3>
+          <ol>
+            <li>从项目档案看最近在做什么。</li>
+            <li>翻一篇开发日志，记录一个技术判断。</li>
+            <li>浏览观测收藏，整理一条兴趣记录。</li>
+          </ol>
+        </ArchiveFrame>
+        <SkillPanel />
+        <CollectionCorner />
+      </aside>
+    </div>
   </PageShell>
 </BaseLayout>
 
 <style>
-  .placeholder {
+  .home-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(18rem, 27vw, 21rem);
+    gap: clamp(1.1rem, 2.2vw, 1.7rem);
+    align-items: start;
+    isolation: isolate;
+  }
+
+  .home-main,
+  .home-side {
+    display: grid;
+    gap: 1.2rem;
+    min-width: 0;
+  }
+
+  .home-section {
     border-radius: var(--radius-lg);
-    padding: clamp(1.4rem, 5vw, 4rem);
+    padding: 1.25rem 0 0.45rem;
   }
 
-  span {
-    color: var(--color-muted);
-    font-family: var(--font-mono);
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+    gap: 1rem;
   }
 
-  h1 {
-    max-width: 48rem;
-    margin: 1rem 0;
+  .post-list {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .observation-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .observation-grid > :global(:nth-child(3)) {
+    grid-column: 1 / -1;
+  }
+
+  .section-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+
+  .home-side {
+    align-self: start;
+  }
+
+  .home-side h3 {
+    margin: 0 0 0.8rem;
     color: var(--color-text);
-    font-size: clamp(2.5rem, 7vw, 5rem);
-    line-height: 1.02;
   }
 
-  p {
-    max-width: 40rem;
+  .home-side ol {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding-left: 1.2rem;
     color: var(--color-muted);
-    font-size: 1.1rem;
-    line-height: 1.8;
+    line-height: 1.65;
+  }
+
+  @media (max-width: 1040px) {
+    .home-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .home-side {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 680px) {
+    .observation-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .observation-grid > :global(:nth-child(3)) {
+      grid-column: auto;
+    }
+
+    .home-side {
+      grid-template-columns: 1fr;
+    }
+
+    .section-actions {
+      justify-content: stretch;
+    }
+
+    .section-actions :global(.button) {
+      width: 100%;
+    }
+  }
+
+  @media (min-width: 681px) and (max-width: 1040px) {
+    .observation-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 </style>

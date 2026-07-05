@@ -1,0 +1,86 @@
+---
+interface Props {
+  title: string;
+  subtitle: string;
+  image: string;
+  alt: string;
+}
+
+const { title, subtitle, image, alt } = Astro.props;
+---
+
+<section class="page-visual-hero">
+  <div class="visual-frame">
+    <img src={image} alt={alt} loading="eager" decoding="async" />
+  </div>
+  <div class="visual-copy">
+    <h1>{title}</h1>
+    <p>{subtitle}</p>
+  </div>
+</section>
+
+<style>
+  .page-visual-hero {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .visual-frame {
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.74);
+    border-radius: 28px;
+    background: #f7fdff;
+    box-shadow: var(--shadow-soft);
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .visual-copy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.76);
+    border-radius: 22px;
+    padding: 0.95rem 1rem;
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(14px);
+  }
+
+  h1,
+  p {
+    margin: 0;
+  }
+
+  h1 {
+    color: var(--color-text);
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    line-height: 1.08;
+  }
+
+  p {
+    max-width: 40rem;
+    color: var(--color-muted);
+    font-weight: 750;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 760px) {
+    .visual-frame {
+      border-radius: 22px;
+    }
+
+    .visual-copy {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>

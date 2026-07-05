@@ -13,9 +13,10 @@ const { title, summary, date, tags, href } = Astro.props;
 const dateText = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' }).format(date);
 ---
 
-<article class="post-card anime-frame">
+<article class="post-card">
+  <img class="card-sticker" src="/assets/chibi-write.png" alt="" loading="lazy" decoding="async" />
   <div class="entry-meta">
-    <span>Log Entry</span>
+    <span>开发日志</span>
     <time datetime={date.toISOString()}>{dateText}</time>
   </div>
   <h3><a href={href}>{title}</a></h3>
@@ -27,10 +28,33 @@ const dateText = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' }).forma
 
 <style>
   .post-card {
+    position: relative;
     display: grid;
     gap: 0.75rem;
-    border-radius: var(--radius-md);
-    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-left: 4px solid color-mix(in srgb, var(--color-blue) 70%, white);
+    border-radius: 16px;
+    padding: 1rem 1rem 1rem 1.1rem;
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+  }
+
+  .post-card > :not(.card-sticker) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-sticker {
+    position: absolute;
+    right: 0.7rem;
+    bottom: 0.55rem;
+    z-index: 0;
+    width: 5.2rem;
+    height: auto;
+    opacity: 0.13;
+    pointer-events: none;
   }
 
   .entry-meta {
@@ -47,7 +71,6 @@ const dateText = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' }).forma
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   h3,
@@ -75,5 +98,12 @@ const dateText = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' }).forma
     display: flex;
     flex-wrap: wrap;
     gap: 0.45rem;
+  }
+
+  @media (max-width: 680px) {
+    .card-sticker {
+      width: 4.4rem;
+      opacity: 0.1;
+    }
   }
 </style>

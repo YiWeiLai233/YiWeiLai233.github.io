@@ -1,0 +1,104 @@
+---
+import { theaterLines } from '@/data/observations';
+---
+
+<section class="mascot-theater vn-frame" aria-label="看板娘小剧场">
+  <div class="theater-art">
+    <img src="/assets/chibi-wave.png" alt="挥手的 Q 版观测站助手" loading="lazy" decoding="async" />
+  </div>
+  <div class="theater-copy">
+    <span>看板娘小剧场</span>
+    <h3>今日观测对白</h3>
+    <ul>
+      {theaterLines.map((line) => <li>{line}</li>)}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .mascot-theater {
+    display: grid;
+    grid-template-columns: clamp(5.6rem, 14vw, 7.2rem) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.1rem;
+    background:
+      radial-gradient(circle at left 28%, color-mix(in srgb, var(--color-pink) 18%, transparent), transparent 11rem),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(238, 250, 255, 0.74));
+  }
+
+  .theater-art {
+    position: relative;
+  }
+
+  .theater-art::before {
+    position: absolute;
+    inset: 20% 6% 6%;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-blue) 18%, transparent);
+    content: '';
+    filter: blur(18px);
+  }
+
+  img {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.68);
+    transform: rotate(-3deg);
+  }
+
+  .theater-copy {
+    display: grid;
+    gap: 0.55rem;
+    min-width: 0;
+  }
+
+  span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 1.2rem;
+  }
+
+  ul {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    border-left: 3px solid color-mix(in srgb, var(--color-pink) 72%, white);
+    border-radius: 12px;
+    padding: 0.45rem 0.62rem;
+    background: rgba(255, 255, 255, 0.58);
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    font-weight: 760;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 520px) {
+    .mascot-theater {
+      grid-template-columns: 1fr;
+    }
+
+    .theater-art {
+      width: 5.6rem;
+    }
+  }
+</style>

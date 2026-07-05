@@ -1,10 +1,16 @@
-<aside class="skill-panel anime-frame">
-  <span>Ability Panel</span>
-  <h3>当前能力面板</h3>
+---
+import { stationStatus } from '@/data/observations';
+---
+
+<aside class="skill-panel vn-frame">
+  <span>观测状态</span>
+  <h3>未来观测站运行中</h3>
+  <div class="level-row">
+    <strong>同步率 74%</strong>
+    <i><b></b></i>
+  </div>
   <ul>
-    <li><strong>Static Site</strong><em>Astro / Content Collections</em></li>
-    <li><strong>Frontend</strong><em>TypeScript / Tailwind / Vue Islands</em></li>
-    <li><strong>Writing</strong><em>Markdown / MDX / Dev Logs</em></li>
+    {stationStatus.map((item) => <li><strong>{item.label}</strong><em>{item.value}</em></li>)}
   </ul>
 </aside>
 
@@ -20,12 +26,43 @@
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   h3 {
     margin: 0.55rem 0 1rem;
     color: var(--color-text);
+  }
+
+  .level-row {
+    display: grid;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+  }
+
+  .level-row strong {
+    width: fit-content;
+    border-radius: 999px;
+    padding: 0.22rem 0.6rem;
+    background: color-mix(in srgb, var(--color-blue) 24%, white);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  .level-row i {
+    display: block;
+    height: 0.45rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .level-row b {
+    display: block;
+    width: 74%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--color-blue), var(--color-pink));
   }
 
   ul {
@@ -40,6 +77,9 @@
     display: grid;
     gap: 0.2rem;
     border-left: 3px solid var(--color-blue);
+    background: rgba(255, 255, 255, 0.38);
+    border-radius: 10px;
+    padding-block: 0.45rem;
     padding-left: 0.75rem;
   }
 

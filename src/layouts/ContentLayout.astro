@@ -6,19 +6,20 @@ interface Props {
   title: string;
   description: string;
   date?: Date;
+  label?: string;
 }
 
-const { title, description, date } = Astro.props;
+const { title, description, date, label = '日志条目' } = Astro.props;
 const dateText = date
   ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'long' }).format(date)
   : '';
 ---
 
-<BaseLayout title={`${title} | 开发书桌`} description={description}>
+<BaseLayout title={`${title} | 未来观测站`} description={description}>
   <PageShell narrow>
     <article class="content-layout anime-frame">
       <header>
-        <span>Log Entry</span>
+        <span>{label}</span>
         <h1>{title}</h1>
         {dateText && <time>{dateText}</time>}
         <p>{description}</p>
@@ -48,7 +49,6 @@ const dateText = date
     font-size: 0.78rem;
     font-weight: 800;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   h1 {

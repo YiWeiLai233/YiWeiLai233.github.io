@@ -7,9 +7,11 @@ interface Props {
   status: 'planning' | 'building' | 'released';
   stack: string[];
   href: string;
+  repo?: string;
+  demo?: string;
 }
 
-const { title, summary, status, stack, href } = Astro.props;
+const { title, summary, status, stack, href, repo, demo } = Astro.props;
 const statusLabel = {
   planning: '构想中',
   building: '构建中',
@@ -17,9 +19,10 @@ const statusLabel = {
 }[status];
 ---
 
-<article class="project-card anime-frame">
+<article class="project-card">
+  <img class="card-sticker" src="/assets/chibi-folder.png" alt="" loading="lazy" decoding="async" />
   <div class="meta-row">
-    <span class="file-label">Project File</span>
+    <span class="file-label">项目档案</span>
     <span class:list={['status', `status-${status}`]}>{statusLabel}</span>
   </div>
   <h3><a href={href}>{title}</a></h3>
@@ -27,6 +30,12 @@ const statusLabel = {
   <div class="stack">
     {stack.map((item) => <TagPill label={item} />)}
   </div>
+  {(repo || demo) && (
+    <div class="project-links">
+      {repo && <a href={repo} target="_blank" rel="noreferrer">GitHub</a>}
+      {demo && <a href={demo} target="_blank" rel="noreferrer">在线演示</a>}
+    </div>
+  )}
 </article>
 
 <style>
@@ -35,21 +44,39 @@ const statusLabel = {
     display: grid;
     gap: 0.85rem;
     min-height: 15rem;
-    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 18px;
     padding: 1.15rem;
+    background:
+      linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(240, 251, 255, 0.76)),
+      linear-gradient(135deg, color-mix(in srgb, var(--color-blue) 16%, transparent), color-mix(in srgb, var(--color-cyan) 12%, transparent));
+    box-shadow: var(--shadow-card);
     overflow: hidden;
   }
 
-  .project-card::after {
+  .project-card::before {
+    height: 3.4rem;
+    margin: -1.15rem -1.15rem 0;
+    content: '';
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--color-blue) 24%, white), color-mix(in srgb, var(--color-pink) 20%, white)),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.42) 1px, transparent 1px);
+    background-size: auto, 18px 18px;
+  }
+
+  .project-card > :not(.card-sticker) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-sticker {
     position: absolute;
-    right: 1rem;
-    bottom: 1rem;
-    color: color-mix(in srgb, var(--color-blue) 22%, transparent);
-    content: 'FILE';
-    font-family: var(--font-mono);
-    font-size: 3rem;
-    font-weight: 900;
-    letter-spacing: 0.08em;
+    right: 0.75rem;
+    bottom: 0.65rem;
+    z-index: 0;
+    width: min(6.2rem, 34%);
+    height: auto;
+    opacity: 0.16;
     pointer-events: none;
   }
 
@@ -66,7 +93,6 @@ const statusLabel = {
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   .file-label {
@@ -76,6 +102,7 @@ const statusLabel = {
   .status {
     border-radius: 999px;
     padding: 0.22rem 0.55rem;
+    background: rgba(255, 255, 255, 0.72);
   }
 
   .status-planning {
@@ -119,5 +146,28 @@ const statusLabel = {
     flex-wrap: wrap;
     gap: 0.45rem;
     margin-top: auto;
+  }
+
+  .project-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .project-links a {
+    border: 1px solid color-mix(in srgb, var(--color-blue) 44%, white);
+    border-radius: 999px;
+    padding: 0.32rem 0.62rem;
+    background: rgba(255, 255, 255, 0.66);
+    color: var(--color-text);
+    font-size: 0.82rem;
+    font-weight: 850;
+  }
+
+  @media (max-width: 680px) {
+    .card-sticker {
+      width: 4.8rem;
+      opacity: 0.12;
+    }
   }
 </style>

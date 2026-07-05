@@ -6,7 +6,7 @@ interface Props {
 const { label } = Astro.props;
 ---
 
-<section class="archive-frame anime-frame">
+<section class="archive-frame vn-frame">
   {label && <span class="archive-label">{label}</span>}
   <slot />
 </section>
@@ -51,6 +51,5 @@ const { label } = Astro.props;
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 </style>

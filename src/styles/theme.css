@@ -1,32 +1,69 @@
 :root {
-  --color-bg: #fff8f0;
+  --color-bg: #f4fbff;
   --color-surface: #ffffff;
-  --color-paper: #fffdf8;
-  --color-text: #25314a;
-  --color-muted: #68738f;
-  --color-line: #eadfce;
-  --color-blue: #7ebfff;
-  --color-pink: #ffb1c9;
-  --color-gold: #e7b75f;
-  --color-cyan: #77d7dd;
-  --shadow-soft: 0 18px 45px rgba(64, 57, 45, 0.12);
-  --shadow-card: 0 12px 28px rgba(64, 57, 45, 0.09);
+  --color-paper: #ffffff;
+  --color-text: #20304b;
+  --color-muted: #5f718d;
+  --color-line: #d8e9f5;
+  --color-blue: #64b5f6;
+  --color-pink: #ffa5bd;
+  --color-gold: #8bd8ba;
+  --color-cyan: #79dce9;
+  --color-ink: #18345a;
+  --color-glass: rgba(255, 255, 255, 0.76);
+  --shadow-soft: 0 26px 70px rgba(61, 103, 136, 0.16);
+  --shadow-card: 0 14px 34px rgba(61, 103, 136, 0.1);
   --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
 .anime-frame {
   border: 1px solid var(--color-line);
-  background: color-mix(in srgb, var(--color-paper) 92%, white);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 253, 255, 0.9)),
+    var(--color-paper);
   box-shadow: var(--shadow-card);
 }
 
 .desk-grid {
   background-image:
-    linear-gradient(rgba(126, 191, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(126, 191, 255, 0.08) 1px, transparent 1px);
-  background-size: 28px 28px;
+    linear-gradient(rgba(111, 157, 222, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(111, 157, 222, 0.08) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+.vn-frame {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(238, 250, 255, 0.72)),
+    rgba(255, 255, 255, 0.72);
+  box-shadow: 0 24px 60px rgba(52, 98, 134, 0.16);
+  backdrop-filter: blur(18px);
+}
+
+.vn-frame::before,
+.vn-frame::after {
+  position: absolute;
+  width: 1.15rem;
+  height: 1.15rem;
+  content: '';
+  border-color: color-mix(in srgb, var(--color-blue) 58%, white);
+}
+
+.vn-frame::before {
+  top: 0.8rem;
+  left: 0.8rem;
+  border-top: 2px solid;
+  border-left: 2px solid;
+}
+
+.vn-frame::after {
+  right: 0.8rem;
+  bottom: 0.8rem;
+  border-right: 2px solid;
+  border-bottom: 2px solid;
 }

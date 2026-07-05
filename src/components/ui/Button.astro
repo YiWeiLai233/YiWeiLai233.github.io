@@ -16,14 +16,22 @@ const { href, variant = 'primary' } = Astro.props;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.8rem;
-    border-radius: 999px;
-    padding: 0.78rem 1.18rem;
+    min-height: 3.05rem;
+    border-radius: 14px;
+    padding: 0.82rem 1.15rem;
     font-size: 0.95rem;
     font-weight: 800;
     line-height: 1;
     text-decoration: none;
-    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    box-shadow: var(--shadow-card);
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+  }
+
+  .button::after {
+    margin-left: 0.75rem;
+    content: '>';
+    font-family: var(--font-mono);
+    font-weight: 900;
   }
 
   .button:hover {
@@ -31,14 +39,14 @@ const { href, variant = 'primary' } = Astro.props;
   }
 
   .button-primary {
-    background: var(--color-text);
+    border: 1px solid color-mix(in srgb, var(--color-ink) 70%, white);
+    background: linear-gradient(135deg, var(--color-ink), color-mix(in srgb, var(--color-blue) 45%, var(--color-ink)));
     color: white;
-    box-shadow: var(--shadow-card);
   }
 
   .button-secondary {
-    border: 1px solid var(--color-line);
-    background: var(--color-paper);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.82);
     color: var(--color-text);
   }
 

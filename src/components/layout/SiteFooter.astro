@@ -1,13 +1,15 @@
 ---
+import { site } from '@/data/site';
+
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
   <div>
-    <span>Desk Log / {year}</span>
-    <p>项目档案、开发日志和一点二次元收藏。</p>
+    <span>{site.name} / {year}</span>
+    <p>由 {site.owner} 整理维护，收纳项目、日志和二次元碎片。</p>
   </div>
-  <a href="/">返回开发书桌</a>
+  <a href="/">返回未来观测站</a>
 </footer>
 
 <style>
@@ -27,7 +29,6 @@ const year = new Date().getFullYear();
     font-size: 0.78rem;
     font-weight: 800;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   p {

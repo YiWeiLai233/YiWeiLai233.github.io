@@ -1,0 +1,117 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageShell from '@/components/layout/PageShell.astro';
+import PageVisualHero from '@/components/feature/PageVisualHero.astro';
+import MiniGuideCard from '@/components/feature/MiniGuideCard.astro';
+import PostCard from '@/components/feature/PostCard.astro';
+import ChapterMascot from '@/components/feature/ChapterMascot.astro';
+import ArchiveFrame from '@/components/ui/ArchiveFrame.astro';
+import TagPill from '@/components/ui/TagPill.astro';
+import { getPostHref, sortPostsByDateDesc } from '@/lib/content';
+
+const posts = sortPostsByDateDesc(await getCollection('posts', ({ data }) => !data.draft));
+const tags = Array.from(new Set(posts.flatMap((post) => post.data.tags)));
+---
+
+<BaseLayout title="开发日志 | 未来观测站" description="技术笔记、开发记录、问题排查和站点迭代日志。">
+  <PageShell>
+    <PageVisualHero
+      title="开发日志"
+      subtitle="记录开发过程中的技术选择、问题排查、实现思路和阶段复盘。"
+      image="/assets/hero-logs.png"
+      alt="看板娘正在书桌前写开发日志"
+    />
+
+    <div class="logs-layout">
+      <main>
+        <ChapterMascot
+          chapter="记录"
+          title="最近记录"
+          subtitle="每篇日志围绕一个明确主题，沉淀可以复查的技术判断和实践记录。"
+          variant="logs"
+        />
+        <div class="post-list">
+          {
+            posts.map((post) => (
+              <PostCard
+                title={post.data.title}
+                summary={post.data.summary}
+                date={post.data.date}
+                tags={post.data.tags}
+                href={getPostHref(post)}
+              />
+            ))
+          }
+        </div>
+      </main>
+
+      <aside class="logs-side">
+        <MiniGuideCard
+          title="写作索引"
+          text="开发日志按时间归档，长期沉淀成个人技术档案。"
+        />
+        <ArchiveFrame label="标签栏">
+          <h2>标签板</h2>
+          <div class="tag-list">
+            {tags.map((tag) => <TagPill label={tag} />)}
+          </div>
+        </ArchiveFrame>
+        <ArchiveFrame label="写作备忘">
+          <h2>写作备忘</h2>
+          <p>新增文章时，将 Markdown 内容文件放入 `src/content/posts`，页面会在构建时自动生成。</p>
+        </ArchiveFrame>
+      </aside>
+    </div>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .logs-side p {
+    max-width: 40rem;
+    margin: 0;
+    color: var(--color-muted);
+    line-height: 1.8;
+  }
+
+  .logs-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 20rem);
+    gap: clamp(1rem, 2vw, 1.5rem);
+    align-items: start;
+  }
+
+  .post-list,
+  .logs-side {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .logs-side h2 {
+    margin: 0 0 0.85rem;
+    color: var(--color-text);
+    font-size: 1.15rem;
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  @media (max-width: 900px) {
+    .logs-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .logs-side {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 680px) {
+    .logs-side {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

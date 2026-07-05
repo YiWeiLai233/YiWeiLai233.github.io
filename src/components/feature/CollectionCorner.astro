@@ -1,12 +1,13 @@
-<aside class="collection-corner anime-frame">
-  <span>Small Collection</span>
-  <h3>小小收藏室</h3>
-  <p>这里会放一些番剧、音乐、游戏和日常碎片，先作为站点里的轻量角落。</p>
+<aside class="collection-corner vn-frame">
+  <span>收藏角落</span>
+  <h3>观测收藏</h3>
+  <p>整理番剧、音乐、游戏和日常灵感，让技术博客之外也保留个人兴趣的温度。</p>
   <div class="chips">
     <b>番剧记录</b>
     <b>音乐循环</b>
     <b>游戏碎片</b>
   </div>
+  <a href="/collections/">进入观测收藏</a>
 </aside>
 
 <style>
@@ -14,7 +15,8 @@
     border-radius: var(--radius-lg);
     padding: 1.2rem;
     background:
-      linear-gradient(135deg, color-mix(in srgb, var(--color-pink) 16%, white), color-mix(in srgb, var(--color-blue) 10%, white));
+      radial-gradient(circle at top right, color-mix(in srgb, var(--color-cyan) 22%, transparent), transparent 12rem),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.82), color-mix(in srgb, var(--color-blue) 10%, white));
   }
 
   span {
@@ -23,7 +25,6 @@
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   h3 {
@@ -45,10 +46,25 @@
   }
 
   b {
+    border: 1px solid rgba(255, 255, 255, 0.72);
     border-radius: 999px;
     padding: 0.28rem 0.58rem;
-    background: rgba(255, 255, 255, 0.68);
+    background: rgba(255, 255, 255, 0.72);
     color: var(--color-text);
     font-size: 0.8rem;
+  }
+
+  a {
+    display: inline-flex;
+    width: fit-content;
+    border: 1px solid color-mix(in srgb, var(--color-blue) 48%, white);
+    border-radius: 999px;
+    margin-top: 1rem;
+    padding: 0.42rem 0.72rem;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--color-text);
+    font-size: 0.82rem;
+    font-weight: 850;
+    text-decoration: none;
   }
 </style>

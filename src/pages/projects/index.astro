@@ -1,0 +1,130 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageShell from '@/components/layout/PageShell.astro';
+import PageVisualHero from '@/components/feature/PageVisualHero.astro';
+import MiniGuideCard from '@/components/feature/MiniGuideCard.astro';
+import ProjectCard from '@/components/feature/ProjectCard.astro';
+import ChapterMascot from '@/components/feature/ChapterMascot.astro';
+import ArchiveFrame from '@/components/ui/ArchiveFrame.astro';
+import TagPill from '@/components/ui/TagPill.astro';
+import { getEntrySlug, getProjectHref, sortProjectsByPriority } from '@/lib/content';
+
+const projects = sortProjectsByPriority(await getCollection('projects'));
+const stacks = Array.from(new Set(projects.flatMap((project) => project.data.stack)));
+---
+
+<BaseLayout title="项目档案 | 未来观测站" description="开发项目、作品状态、技术栈与维护计划的归档。">
+  <PageShell>
+    <PageVisualHero
+      title="项目档案"
+      subtitle="集中整理忆丶未来的开发项目，记录目标、进度、技术栈与维护状态。"
+      image="/assets/hero-projects.png"
+      alt="看板娘正在整理项目档案和蓝图"
+    />
+
+    <div class="archive-layout">
+      <main class="project-list">
+        <ChapterMascot
+          chapter="档案"
+          title="当前档案"
+          subtitle="核心项目按状态和技术栈归档，便于回顾实现过程和长期维护。"
+          variant="projects"
+        />
+        <div class="project-grid">
+          {
+            projects.map((project) => (
+              <div id={getEntrySlug(project.id)}>
+                <ProjectCard
+                  title={project.data.title}
+                  summary={project.data.summary}
+                  status={project.data.status}
+                  stack={project.data.stack}
+                  href={getProjectHref(project)}
+                  repo={project.data.repo}
+                  demo={project.data.demo}
+                />
+              </div>
+            ))
+          }
+        </div>
+      </main>
+
+      <aside class="archive-side">
+        <MiniGuideCard
+          title="档案索引"
+          text="项目页用于整理作品状态、技术组合和复盘入口。"
+        />
+        <ArchiveFrame label="技术清单">
+          <h2>技术物品栏</h2>
+          <div class="stack-list">
+            {stacks.map((stack) => <TagPill label={stack} />)}
+          </div>
+        </ArchiveFrame>
+        <ArchiveFrame label="维护方向">
+          <h2>维护方向</h2>
+          <p>重点项目将补充截图、复盘、仓库链接和版本时间线，形成更完整的作品档案。</p>
+        </ArchiveFrame>
+      </aside>
+    </div>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .archive-side p {
+    max-width: 40rem;
+    margin: 0;
+    color: var(--color-muted);
+    line-height: 1.8;
+  }
+
+  .archive-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 20rem);
+    gap: clamp(1rem, 2vw, 1.5rem);
+    align-items: start;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .archive-side {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .archive-side h2 {
+    margin: 0 0 0.85rem;
+    color: var(--color-text);
+    font-size: 1.15rem;
+  }
+
+  .stack-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  @media (max-width: 900px) {
+    .archive-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .archive-side {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 680px) {
+    .project-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .archive-side {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

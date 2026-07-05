@@ -1,0 +1,197 @@
+---
+import TagPill from '@/components/ui/TagPill.astro';
+import { observationKinds, type ObservationItem } from '@/data/observations';
+
+interface Props {
+  item: ObservationItem;
+  compact?: boolean;
+}
+
+const { item, compact = false } = Astro.props;
+---
+
+<article class:list={['observation-card', `accent-${item.accent}`, compact && 'is-compact']}>
+  <div class="observation-art" aria-hidden="true">
+    <img src={item.image} alt="" loading="lazy" decoding="async" />
+  </div>
+  <div class="observation-copy">
+    <div class="meta-row">
+      <span>{observationKinds[item.kind]}</span>
+      <b>{item.status}</b>
+    </div>
+    <h3>{item.title}</h3>
+    <p class="subtitle">{item.subtitle}</p>
+    <p>{item.description}</p>
+    <div class="tag-list">
+      {item.tags.map((tag) => <TagPill label={tag} />)}
+    </div>
+  </div>
+</article>
+
+<style>
+  .observation-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 13.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.76);
+    border-radius: 20px;
+    padding: 1rem;
+    background:
+      radial-gradient(circle at top right, var(--accent-soft), transparent 10rem),
+      linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(238, 250, 255, 0.72));
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(14px);
+  }
+
+  .observation-card::before {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    height: 0.24rem;
+    background: linear-gradient(90deg, var(--accent), rgba(255, 255, 255, 0));
+    content: '';
+  }
+
+  .accent-blue {
+    --accent: color-mix(in srgb, var(--color-blue) 82%, white);
+    --accent-soft: color-mix(in srgb, var(--color-blue) 22%, transparent);
+  }
+
+  .accent-pink {
+    --accent: color-mix(in srgb, var(--color-pink) 84%, white);
+    --accent-soft: color-mix(in srgb, var(--color-pink) 22%, transparent);
+  }
+
+  .accent-cyan {
+    --accent: color-mix(in srgb, var(--color-cyan) 82%, white);
+    --accent-soft: color-mix(in srgb, var(--color-cyan) 20%, transparent);
+  }
+
+  .accent-gold {
+    --accent: color-mix(in srgb, var(--color-gold) 86%, white);
+    --accent-soft: color-mix(in srgb, var(--color-gold) 22%, transparent);
+  }
+
+  .observation-copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.58rem;
+    min-width: 0;
+    padding-right: clamp(4.5rem, 22%, 6.8rem);
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .meta-row span,
+  .meta-row b {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+  }
+
+  .meta-row b {
+    border-radius: 999px;
+    padding: 0.2rem 0.52rem;
+    background: rgba(255, 255, 255, 0.74);
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+
+  h3,
+  p {
+    margin: 0;
+  }
+
+  h3 {
+    color: var(--color-text);
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+
+  p {
+    color: var(--color-muted);
+    line-height: 1.65;
+  }
+
+  .subtitle {
+    color: color-mix(in srgb, var(--color-text) 78%, var(--color-muted));
+    font-weight: 850;
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.42rem;
+    margin-top: auto;
+  }
+
+  .observation-art {
+    position: absolute;
+    right: 0.85rem;
+    bottom: 0.7rem;
+    z-index: 0;
+    width: clamp(5rem, 24%, 7.2rem);
+    opacity: 0.34;
+  }
+
+  .observation-art::before {
+    position: absolute;
+    inset: auto 0 0;
+    aspect-ratio: 1;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    content: '';
+    filter: blur(18px);
+  }
+
+  .observation-art img {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 18px;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 18px rgba(61, 103, 136, 0.12));
+  }
+
+  .is-compact {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 12rem;
+  }
+
+  .is-compact .observation-copy {
+    padding-right: 4.4rem;
+  }
+
+  .is-compact .observation-art {
+    right: 0.75rem;
+    bottom: 0.65rem;
+    width: 5.2rem;
+    opacity: 0.24;
+  }
+
+  .is-compact .observation-art::before {
+    inset: 18% 0 0;
+  }
+
+  @media (max-width: 720px) {
+    .observation-copy {
+      padding-right: 3.4rem;
+    }
+
+    .observation-art {
+      width: 4.8rem;
+      opacity: 0.22;
+    }
+  }
+</style>
