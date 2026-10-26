@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# 构建产物与源文件无需收录
+Disallow: /_astro/
+
+Sitemap: https://yiweilai233.github.io/sitemap-index.xml

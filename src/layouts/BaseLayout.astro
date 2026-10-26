@@ -4,32 +4,95 @@ import SiteFooter from '@/components/layout/SiteFooter.astro';
 import SiteHeader from '@/components/layout/SiteHeader.astro';
 import QuestWidget from '@/components/islands/QuestWidget.vue';
 import { site } from '@/data/site';
+import { absoluteUrl, normalizePath } from '@/lib/url';
 
 interface Props {
   title?: string;
   description?: string;
+  /** 页面类型，决定 OG type */
+  type?: 'website' | 'article';
+  /** 分享卡图，默认站点预告图 */
+  image?: string;
+  /** 追加到 <head> 的内容（RSS、结构化数据等） */
+  noindex?: boolean;
 }
 
 const {
   title = site.name,
-  description = `${site.owner} 的项目档案、开发日志和二次元收藏。`
+  description = site.description,
+  type = 'website',
+  image = site.ogImage,
+  noindex = false
 } = Astro.props;
+
+const canonical = absoluteUrl(normalizePath(Astro.url.pathname));
+const ogImage = image.startsWith('http') ? image : absoluteUrl(image);
+const pageTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang={site.lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <title>{title}</title>
+    <meta name="theme-color" content="#f4fbff" />
+    <meta name="author" content={site.owner} />
+    <title>{pageTitle}</title>
+
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} · 开发日志`} href="/rss.xml" />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="zh_CN" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <slot name="head" />
   </head>
   <body>
+    <span id="top"></span>
+    <a class="skip-link" href="#main">跳到主要内容</a>
     <SiteHeader />
-    <main>
+    <main id="main">
       <slot />
     </main>
     <SiteFooter />
     <QuestWidget client:load />
   </body>
 </html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -4rem;
+    left: 1rem;
+    z-index: 100;
+    border-radius: 999px;
+    padding: 0.6rem 1rem;
+    background: var(--color-text);
+    color: #fff;
+    font-weight: 800;
+    text-decoration: none;
+    transition: top 160ms ease;
+  }
+
+  .skip-link:focus-visible {
+    top: 1rem;
+  }
+</style>
