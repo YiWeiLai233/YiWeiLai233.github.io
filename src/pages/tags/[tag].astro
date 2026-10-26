@@ -1,0 +1,144 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageShell from '@/components/layout/PageShell.astro';
+import PostCard from '@/components/feature/PostCard.astro';
+import ArchiveFrame from '@/components/ui/ArchiveFrame.astro';
+import { collectTags, getPostHref, getTagHref, sortPostsByDateDesc } from '@/lib/content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  const tags = collectTags(posts);
+
+  return tags.map(({ tag, count }) => {
+    const matched = sortPostsByDateDesc(posts.filter((post) => post.data.tags.includes(tag)));
+    const related = tags.filter((item) => item.tag !== tag).slice(0, 8);
+
+    return {
+      params: { tag },
+      props: { tag, count, posts: matched, related }
+    };
+  });
+}
+
+const { tag, count, posts, related } = Astro.props;
+const allTags = collectTags(await getCollection('posts', ({ data }) => !data.draft));
+---
+
+<BaseLayout
+  title={`标签：${tag}`}
+  description={`所有带有「${tag}」标签的开发日志，共 ${count} 篇。`}
+>
+  <PageShell narrow>
+    <header class="page-head">
+      <span class="eyebrow">TAG / {allTags.length} 个标签</span>
+      <h1>#{tag}</h1>
+      <p>共 {count} 篇日志带有这个标签。</p>
+      <a class="back" href="/tags/">← 回到标签索引</a>
+    </header>
+
+    <div class="post-list">
+      {
+        posts.map((post) => (
+          <PostCard
+            title={post.data.title}
+            summary={post.data.summary}
+            date={post.data.date}
+            tags={post.data.tags}
+            href={getPostHref(post)}
+            category={post.data.category}
+          />
+        ))
+      }
+    </div>
+
+    {
+      related.length > 0 && (
+        <ArchiveFrame label="相邻标签">
+          <div class="related">
+            {related.map((item) => (
+              <a href={getTagHref(item.tag)}>
+                {item.tag}
+                <span>{item.count}</span>
+              </a>
+            ))}
+          </div>
+        </ArchiveFrame>
+      )
+    }
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .page-head {
+    display: grid;
+    gap: 0.55rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .eyebrow {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .page-head h1 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  .page-head p {
+    margin: 0;
+    color: var(--color-muted);
+    line-height: 1.8;
+  }
+
+  .back {
+    color: var(--color-text);
+    font-weight: 800;
+    text-decoration: none;
+    font-size: 0.92rem;
+  }
+
+  .back:hover {
+    color: color-mix(in srgb, var(--color-blue) 70%, var(--color-ink));
+  }
+
+  .post-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .related {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .related a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border: 1px solid color-mix(in srgb, var(--color-blue) 45%, var(--color-line));
+    border-radius: 999px;
+    padding: 0.28rem 0.62rem;
+    background: color-mix(in srgb, var(--color-blue) 10%, white);
+    color: var(--color-text);
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .related span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .related a:hover {
+    border-color: color-mix(in srgb, var(--color-pink) 60%, var(--color-line));
+  }
+</style>

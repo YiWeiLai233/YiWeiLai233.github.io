@@ -1,5 +1,6 @@
 ---
 import TagPill from '@/components/ui/TagPill.astro';
+import { getTagHref } from '@/lib/content';
 
 interface Props {
   title: string;
@@ -7,22 +8,27 @@ interface Props {
   date: Date;
   tags: string[];
   href: string;
+  category?: string;
 }
 
-const { title, summary, date, tags, href } = Astro.props;
+const { title, summary, date, tags, href, category } = Astro.props;
 const dateText = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' }).format(date);
 ---
 
 <article class="post-card">
-  <img class="card-sticker" src="/assets/chibi-write.png" alt="" loading="lazy" decoding="async" />
+  <img class="card-sticker" src="/assets/chibi-write.webp" alt="" loading="lazy" decoding="async" />
   <div class="entry-meta">
-    <span>开发日志</span>
+    <span>{category ?? '开发日志'}</span>
     <time datetime={date.toISOString()}>{dateText}</time>
   </div>
   <h3><a href={href}>{title}</a></h3>
   <p>{summary}</p>
   <div class="tags">
-    {tags.map((tag) => <TagPill label={tag} />)}
+    {tags.map((tag) => (
+      <a class="tag-link" href={getTagHref(tag)}>
+        <TagPill label={tag} />
+      </a>
+    ))}
   </div>
 </article>
 
@@ -39,6 +45,17 @@ const dateText = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' }).forma
     box-shadow: var(--shadow-card);
     backdrop-filter: blur(10px);
     overflow: hidden;
+    transition:
+      transform 170ms ease,
+      box-shadow 170ms ease,
+      border-color 170ms ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.9);
+    border-left-color: color-mix(in srgb, var(--color-pink) 78%, white);
+    box-shadow: var(--shadow-pop);
   }
 
   .post-card > :not(.card-sticker) {
@@ -89,15 +106,18 @@ const dateText = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' }).forma
     text-decoration: none;
   }
 
-  p {
-    color: var(--color-muted);
-    line-height: 1.7;
-  }
-
   .tags {
     display: flex;
     flex-wrap: wrap;
     gap: 0.45rem;
+  }
+
+  .tag-link {
+    text-decoration: none;
+  }
+
+  .tag-link:hover {
+    filter: brightness(0.96);
   }
 
   @media (max-width: 680px) {

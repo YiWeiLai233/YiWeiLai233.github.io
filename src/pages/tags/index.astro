@@ -1,0 +1,144 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageShell from '@/components/layout/PageShell.astro';
+import ArchiveFrame from '@/components/ui/ArchiveFrame.astro';
+import MiniGuideCard from '@/components/feature/MiniGuideCard.astro';
+import { collectTags, getPostHref, getTagHref, sortPostsByDateDesc } from '@/lib/content';
+
+const posts = sortPostsByDateDesc(await getCollection('posts', ({ data }) => !data.draft));
+const tags = collectTags(posts);
+---
+
+<BaseLayout
+  title="标签索引"
+  description="按标签索引所有开发日志：Astro、AI、WPF、数据库、部署运维等技术主题。"
+>
+  <PageShell narrow>
+    <header class="page-head">
+      <span class="eyebrow">TAG INDEX</span>
+      <h1>标签索引</h1>
+      <p>共 {tags.length} 个标签、{posts.length} 篇日志。点击任一标签查看对应记录。</p>
+    </header>
+
+    <div class="tag-grid">
+      {
+        tags.map((item) => (
+          <a class="tag-card" href={getTagHref(item.tag)}>
+            <strong>{item.tag}</strong>
+            <span>{item.count} 篇</span>
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="side">
+      <MiniGuideCard title="怎么用" text="标签是跨项目、跨时间的技术线索，比按日期翻更高效。" />
+      <ArchiveFrame label="最近更新">
+        <ul class="recent">
+          {
+            posts.slice(0, 5).map((post) => (
+              <li>
+                <a href={getPostHref(post)}>{post.data.title}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </ArchiveFrame>
+    </div>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .page-head {
+    display: grid;
+    gap: 0.55rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .eyebrow {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .page-head h1 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+  }
+
+  .page-head p {
+    margin: 0;
+    color: var(--color-muted);
+    line-height: 1.8;
+  }
+
+  .tag-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+    gap: 0.7rem;
+  }
+
+  .tag-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    padding: 0.72rem 0.9rem;
+    background: rgba(255, 255, 255, 0.86);
+    color: var(--color-text);
+    text-decoration: none;
+    box-shadow: var(--shadow-card);
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .tag-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-pop);
+  }
+
+  .tag-card strong {
+    font-size: 0.95rem;
+  }
+
+  .tag-card span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 800;
+  }
+
+  .side {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1rem;
+    margin-top: 1.6rem;
+  }
+
+  .recent {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .recent a {
+    color: var(--color-text);
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-decoration: none;
+    line-height: 1.5;
+  }
+
+  .recent a:hover {
+    color: color-mix(in srgb, var(--color-blue) 70%, var(--color-ink));
+  }
+</style>
