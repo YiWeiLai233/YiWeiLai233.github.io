@@ -40,36 +40,44 @@ npm run build
 - 首页主标题
 - 首页主介绍
 
-## 修改观测收藏卡片
+## 新增一条观测收藏
 
-文件：`src/data/observations.ts`
+目录：`src/content/observations`
 
-这里维护番剧、游戏、音乐、日常碎片等收藏卡片。首页和观测收藏页共用这份数据。
+观测收藏分成四类：`anime`（番剧）、`game`（游戏）、`music`（音乐）、`daily`（日常碎片）。一条收藏就是一个 Markdown 文件，会自动生成独立详情页 `/collections/<文件名>/`。
 
-每张卡片主要字段：
+文件模板：
 
-```ts
-{
-  kind: 'anime',
-  title: '番剧观测席',
-  subtitle: '记录想补、正在看和值得回味的作品',
-  status: '观测中',
-  description: '收纳轻松向、日常向和适合休息时观看的作品，并记录角色、片段与观后感。',
-  tags: ['番剧', '补番', '观后感'],
-  image: '/assets/chibi-wave.png',
-  accent: 'pink'
-}
+```md
+---
+title: "作品名"
+kind: anime
+status: ongoing
+rating: 8.6
+date: 2026-10-12
+finishedDate: 2026-11-02
+summary: "一句话说明这是什么、为什么记下来。"
+link: "https://bangumi.tv"
+linkLabel: "Bangumi"
+---
+
+正文写观感、进度或截图说明，Markdown 全部可用。
 ```
 
-常用修改方式：
+字段说明：
 
-- `title`：卡片标题
-- `subtitle`：卡片副标题
-- `status`：右上角状态
-- `description`：正文介绍
-- `tags`：标签
-- `image`：卡片上的 Q 版角色图
-- `accent`：卡片颜色，可用 `blue`、`pink`、`cyan`、`gold`
+- `title`：条目名称
+- `kind`：分类，`anime` / `game` / `music` / `daily`，决定落在哪一段和用什么配色
+- `status`：`planned` 想看 / `ongoing` 在看 / `finished` 看完 / `dropped` 搁置
+  （游戏类自动显示成「想玩 / 在玩 / 通关 / 吃灰」，音乐类显示成「收藏 / 循环中 / 听腻了 / 归档」）
+- `rating`：0–10 的评分，**留空就不显示评分**，歌单这类不必打分
+- `date`：开始或记录日期，列表按它排序，**进行中的会浮到最前**
+- `finishedDate`：看完/通关日期，进行中可留空
+- `summary`：卡片上的一句话摘要，太长会在第 3 行截断
+- `link` / `linkLabel`：原站外链，例如 Bangumi、Steam、网易云
+- `draft: true`：草稿，不会被构建进站点
+
+分类的名称、说明、配色和状态文案统一在 `src/data/observations.ts` 里维护，改一处全站生效。`src/content/observations/` 下的 `example-*.md` 是四条示例，可以直接替换成真实内容。
 
 ## 新增开发日志
 
@@ -180,7 +188,7 @@ image="/assets/hero-about.png"
 ## 维护原则
 
 - 文章和项目尽量用 Markdown 维护。
-- 收藏卡片统一改 `src/data/observations.ts`。
+- 观测收藏条目在 `src/content/observations`，分类元数据改 `src/data/observations.ts`。
 - 站点基础信息统一改 `src/data/site.ts`。
 - 图片统一放在 `public/assets`。
 - 修改前先确认要改的是内容、页面文案还是样式。
