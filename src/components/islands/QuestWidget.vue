@@ -151,7 +151,7 @@ onBeforeUnmount(() => {
       @click="togglePanel"
     >
       <span class="tab-avatar">
-        <img src="/assets/mini-guide-sticker.png" alt="" />
+        <img src="/assets/mini-guide-sticker.webp" alt="" />
       </span>
       <span class="tab-copy">
         <strong>观测板</strong>
@@ -162,7 +162,7 @@ onBeforeUnmount(() => {
     <div v-if="open" class="quest-panel">
       <header @pointerdown="startDrag">
         <div class="panel-title">
-          <img src="/assets/mini-guide-sticker.png" alt="" />
+          <img src="/assets/mini-guide-sticker.webp" alt="" />
           <div>
             <span>今日观测</span>
             <strong>未来观测站</strong>

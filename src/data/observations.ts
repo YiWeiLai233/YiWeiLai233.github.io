@@ -26,7 +26,7 @@ export const observations: ObservationItem[] = [
     status: '观测中',
     description: '收纳轻松向、日常向和适合休息时观看的作品，并记录角色、片段与观后感。',
     tags: ['番剧', '补番', '观后感'],
-    image: '/assets/chibi-wave.png',
+    image: '/assets/chibi-wave.webp',
     accent: 'pink'
   },
   {
@@ -36,7 +36,7 @@ export const observations: ObservationItem[] = [
     status: '存档中',
     description: '记录通关进度、角色养成、截图和游玩感想，形成一份持续更新的游戏档案。',
     tags: ['游戏', '存档', '截图'],
-    image: '/assets/chibi-folder.png',
+    image: '/assets/chibi-folder.webp',
     accent: 'blue'
   },
   {
@@ -46,7 +46,7 @@ export const observations: ObservationItem[] = [
     status: '循环中',
     description: '收纳适合写代码、发呆和夜间整理内容时循环播放的音乐，保留当下的氛围记忆。',
     tags: ['音乐', '歌单', '氛围'],
-    image: '/assets/chibi-write.png',
+    image: '/assets/chibi-write.webp',
     accent: 'cyan'
   },
   {
@@ -56,7 +56,7 @@ export const observations: ObservationItem[] = [
     status: '收集中',
     description: '记录短句、灵感、截图和生活片段，让零散日常也能沉淀成可回看的内容。',
     tags: ['日常', '碎片', '随笔'],
-    image: '/assets/mini-guide-sticker.png',
+    image: '/assets/mini-guide-sticker.webp',
     accent: 'gold'
   }
 ];
