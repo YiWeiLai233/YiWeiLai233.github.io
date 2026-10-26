@@ -1,6 +1,6 @@
 # 未来观测站内容维护笔记
 
-项目目录：`F:\anime-developer-blog`
+项目目录：`D:\agent\anime-developer-blog`（GitHub 仓库 `YiWeiLai233/YiWeiLai233.github.io`，线上 <https://yiweilai233.github.io/>）
 
 这个站点目前采用静态维护方式，不设置登录后台。日常维护就是修改项目里的内容文件，然后本地预览、构建、发布。
 
@@ -9,7 +9,7 @@
 进入项目目录：
 
 ```powershell
-cd F:\anime-developer-blog
+cd D:\agent\anime-developer-blog
 ```
 
 本地预览：
