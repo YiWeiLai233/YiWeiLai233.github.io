@@ -41,3 +41,36 @@ img {
   background: color-mix(in srgb, var(--color-pink) 34%, white);
   color: var(--color-text);
 }
+
+/* 键盘导航时给出清晰焦点环，鼠标点击不触发 */
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-blue) 78%, var(--color-ink));
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* 长标题在窄屏下的折行质量 */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p,
+li {
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

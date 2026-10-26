@@ -44,6 +44,28 @@ const { post, prev, next } = Astro.props;
 const { Content } = await post.render();
 const { minutes } = getReadingTime(post.body ?? '');
 const toc = extractToc(post.body ?? '');
+
+// 结构化数据：让搜索引擎识别这是一篇带作者与发布日期的技术文章
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.summary,
+  datePublished: post.data.date.toISOString(),
+  dateModified: post.data.date.toISOString(),
+  keywords: post.data.tags.join(', '),
+  articleSection: post.data.category,
+  inLanguage: 'zh-CN',
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': `https://yiweilai233.github.io/logs/${getEntrySlug(post.id)}/`
+  },
+  author: {
+    '@type': 'Person',
+    name: '忆丶未来',
+    url: 'https://github.com/YiWeiLai233'
+  }
+};
 ---
 
 <ContentLayout
@@ -57,5 +79,8 @@ const toc = extractToc(post.body ?? '');
   prev={prev}
   next={next}
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
   <Content />
 </ContentLayout>

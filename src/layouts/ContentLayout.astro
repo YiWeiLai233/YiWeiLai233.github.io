@@ -38,6 +38,9 @@ const hasAside = toc.length > 2;
 ---
 
 <BaseLayout title={title} description={description} type="article">
+  <Fragment slot="head">
+    <slot name="head" />
+  </Fragment>
   <PageShell narrow={!hasAside}>
     <article class="content-layout anime-frame">
       <header>
