@@ -1,65 +1,60 @@
 export type ObservationKind = 'anime' | 'game' | 'music' | 'daily';
+export type ObservationStatus = 'planned' | 'ongoing' | 'finished' | 'dropped';
 
-export interface ObservationItem {
-  kind: ObservationKind;
-  title: string;
-  subtitle: string;
-  status: string;
+/** 观测区四个分类：名称、说明、配色、吉祥物。 */
+export interface ObservationKindMeta {
+  label: string;
+  short: string;
   description: string;
-  tags: string[];
-  image: string;
   accent: 'blue' | 'pink' | 'cyan' | 'gold';
+  image: string;
+  /** 状态文案随分类变化：番剧是「在看」，游戏是「在玩」 */
+  statusLabels: Record<ObservationStatus, string>;
+  /** 完成态用词：番剧用「看完」，游戏用「通关」 */
+  finishedLabel: string;
 }
 
-export const observationKinds: Record<ObservationKind, string> = {
-  anime: '番剧观测',
-  game: '游戏存档',
-  music: '音乐循环',
-  daily: '日常碎片'
+export const observationKinds: Record<ObservationKind, ObservationKindMeta> = {
+  anime: {
+    label: '番剧观测',
+    short: '番剧',
+    description: '想补的、在看的和值得回味的作品，记录角色、片段与观后感。',
+    accent: 'pink',
+    image: '/assets/chibi-wave.webp',
+    statusLabels: { planned: '想看', ongoing: '在看', finished: '看完', dropped: '搁置' },
+    finishedLabel: '看完'
+  },
+  game: {
+    label: '游戏存档',
+    short: '游戏',
+    description: '正在推进和想重新打开的游戏，记录进度、养成与截图。',
+    accent: 'blue',
+    image: '/assets/chibi-folder.webp',
+    statusLabels: { planned: '想玩', ongoing: '在玩', finished: '通关', dropped: '吃灰' },
+    finishedLabel: '通关'
+  },
+  music: {
+    label: '音乐循环',
+    short: '音乐',
+    description: '写代码和整理站点时循环播放的音乐，保留当下的氛围记忆。',
+    accent: 'cyan',
+    image: '/assets/chibi-write.webp',
+    statusLabels: { planned: '收藏', ongoing: '循环中', finished: '听腻了', dropped: '归档' },
+    finishedLabel: '循环中'
+  },
+  daily: {
+    label: '日常碎片',
+    short: '日常',
+    description: '短句、灵感、截图和生活片段，让零散日常也能沉淀下来。',
+    accent: 'gold',
+    image: '/assets/mini-guide-sticker.webp',
+    statusLabels: { planned: '记下', ongoing: '收集中', finished: '已归档', dropped: '放弃' },
+    finishedLabel: '已归档'
+  }
 };
 
-export const observations: ObservationItem[] = [
-  {
-    kind: 'anime',
-    title: '番剧观测席',
-    subtitle: '记录想补、正在看和值得回味的作品',
-    status: '观测中',
-    description: '收纳轻松向、日常向和适合休息时观看的作品，并记录角色、片段与观后感。',
-    tags: ['番剧', '补番', '观后感'],
-    image: '/assets/chibi-wave.webp',
-    accent: 'pink'
-  },
-  {
-    kind: 'game',
-    title: '游戏存档点',
-    subtitle: '记录正在推进和想重新打开的游戏',
-    status: '存档中',
-    description: '记录通关进度、角色养成、截图和游玩感想，形成一份持续更新的游戏档案。',
-    tags: ['游戏', '存档', '截图'],
-    image: '/assets/chibi-folder.webp',
-    accent: 'blue'
-  },
-  {
-    kind: 'music',
-    title: '夜间循环歌单',
-    subtitle: '记录写代码和整理站点时的背景音乐',
-    status: '循环中',
-    description: '收纳适合写代码、发呆和夜间整理内容时循环播放的音乐，保留当下的氛围记忆。',
-    tags: ['音乐', '歌单', '氛围'],
-    image: '/assets/chibi-write.webp',
-    accent: 'cyan'
-  },
-  {
-    kind: 'daily',
-    title: '日常碎片匣',
-    subtitle: '收纳短句、灵感和生活片段',
-    status: '收集中',
-    description: '记录短句、灵感、截图和生活片段，让零散日常也能沉淀成可回看的内容。',
-    tags: ['日常', '碎片', '随笔'],
-    image: '/assets/mini-guide-sticker.webp',
-    accent: 'gold'
-  }
-];
+/** 分类在页面上的固定展示顺序 */
+export const observationKindOrder: ObservationKind[] = ['anime', 'game', 'music', 'daily'];
 
 export const theaterLines = [
   '今天巡一下项目档案，还是整理一段观测收藏？',

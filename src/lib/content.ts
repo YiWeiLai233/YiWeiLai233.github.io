@@ -12,12 +12,33 @@ export function getProjectHref(project: Pick<CollectionEntry<'projects'>, 'id'>)
   return `/projects/${getEntrySlug(project.id)}/`;
 }
 
+export function getObservationHref(item: Pick<CollectionEntry<'observations'>, 'id'>) {
+  return `/collections/${getEntrySlug(item.id)}/`;
+}
+
+export function getKindHref(kind: string) {
+  return `/collections/#${kind}`;
+}
+
 export function getTagHref(tag: string) {
   return `/tags/${encodeURIComponent(tag)}/`;
 }
 
 export function sortPostsByDateDesc<T extends { data: { date: Date } }>(items: T[]) {
   return [...items].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+}
+
+/** 观测收藏排序：进行中的优先，其次按日期倒序，让「最近在看的」浮到前面。 */
+export function sortObservationsByDateDesc<
+  T extends { data: { date: Date; status?: string } }
+>(items: T[]) {
+  return [...items].sort((a, b) => {
+    const aActive = a.data.status === 'ongoing' ? 0 : 1;
+    const bActive = b.data.status === 'ongoing' ? 0 : 1;
+    if (aActive !== bActive) return aActive - bActive;
+
+    return b.data.date.getTime() - a.data.date.getTime();
+  });
 }
 
 export function sortProjectsByPriority<T extends { data: { featured?: boolean; title: string } }>(items: T[]) {
@@ -36,6 +57,12 @@ export function formatDate(date: Date) {
 
 export function formatDateLong(date: Date) {
   return new Intl.DateTimeFormat('zh-CN', { dateStyle: 'long' }).format(date);
+}
+
+/** 评分显示：整数原样，小数保留一位（8.5、9、7.8）。 */
+export function formatRating(rating?: number) {
+  if (rating === undefined) return '';
+  return Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
 }
 
 /** 估算阅读时长：中文按 350 字/分钟，英文按 200 词/分钟。 */
