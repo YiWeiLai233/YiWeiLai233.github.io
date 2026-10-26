@@ -17,7 +17,9 @@ import { observations } from '@/data/observations';
 import { getEntrySlug, getPostHref, getProjectHref, sortPostsByDateDesc, sortProjectsByPriority } from '@/lib/content';
 
 const posts = sortPostsByDateDesc(await getCollection('posts', ({ data }) => !data.draft)).slice(0, 3);
-const projects = sortProjectsByPriority(await getCollection('projects')).slice(0, 3);
+// 首页与项目档案页共用同一套 featured 排序逻辑：首页展示全部精选项目，
+// 不再截断，完整清单通过下方「查看全部项目」进入 /projects/。
+const projects = sortProjectsByPriority(await getCollection('projects', ({ data }) => data.featured));
 const featuredObservations = observations.slice(0, 3);
 ---
 
@@ -49,6 +51,9 @@ const featuredObservations = observations.slice(0, 3);
                 </div>
               ))
             }
+          </div>
+          <div class="section-actions">
+            <Button href="/projects/" variant="secondary">查看全部项目</Button>
           </div>
         </section>
 
