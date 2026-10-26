@@ -13,14 +13,33 @@ import ObservationCard from '@/components/feature/ObservationCard.astro';
 import MascotTheater from '@/components/feature/MascotTheater.astro';
 import ArchiveFrame from '@/components/ui/ArchiveFrame.astro';
 import Button from '@/components/ui/Button.astro';
-import { observations } from '@/data/observations';
-import { getEntrySlug, getPostHref, getProjectHref, sortPostsByDateDesc, sortProjectsByPriority } from '@/lib/content';
+import { observationKinds, observationKindOrder } from '@/data/observations';
+import {
+  getEntrySlug,
+  getObservationHref,
+  getPostHref,
+  getProjectHref,
+  sortObservationsByDateDesc,
+  sortPostsByDateDesc,
+  sortProjectsByPriority
+} from '@/lib/content';
 
 const posts = sortPostsByDateDesc(await getCollection('posts', ({ data }) => !data.draft)).slice(0, 3);
 // 首页与项目档案页共用同一套 featured 排序逻辑：首页展示全部精选项目，
 // 不再截断，完整清单通过下方「查看全部项目」进入 /projects/。
 const projects = sortProjectsByPriority(await getCollection('projects', ({ data }) => data.featured));
-const featuredObservations = observations.slice(0, 3);
+// 观测区展示最近记下的 3 条真实条目，而不是分类入口
+const allObservations = sortObservationsByDateDesc(
+  await getCollection('observations', ({ data }) => !data.draft)
+);
+const featuredObservations = allObservations.slice(0, 3);
+const kindCounts = observationKindOrder
+  .map((kind) => ({
+    kind,
+    label: observationKinds[kind].short,
+    count: allObservations.filter((item) => item.data.kind === kind).length
+  }))
+  .filter((entry) => entry.count > 0);
 ---
 
 <BaseLayout title="未来观测站 | 忆丶未来的二次元个人站">
@@ -61,12 +80,37 @@ const featuredObservations = observations.slice(0, 3);
           <ChapterMascot
             chapter="收藏"
             title="二次元观测区"
-            subtitle="整理番剧、游戏、音乐和日常灵感，让兴趣内容成为站点的一部分。"
+            subtitle="番剧、游戏、音乐和日常碎片的具体条目，每条都有独立页面记录评分与进度。"
             variant="home"
           />
           <div class="observation-grid">
-            {featuredObservations.map((item) => <ObservationCard item={item} compact />)}
+            {
+              featuredObservations.map((item) => (
+                <ObservationCard
+                  item={{
+                    title: item.data.title,
+                    summary: item.data.summary,
+                    kind: item.data.kind,
+                    status: item.data.status,
+                    rating: item.data.rating,
+                    date: item.data.date,
+                    href: getObservationHref(item)
+                  }}
+                  compact
+                />
+              ))
+            }
           </div>
+          {kindCounts.length > 0 && (
+            <div class="kind-tally">
+              {kindCounts.map((entry) => (
+                <a href={`/collections/#${entry.kind}`}>
+                  {entry.label}
+                  <span>{entry.count}</span>
+                </a>
+              ))}
+            </div>
+          )}
           <div class="section-actions">
             <Button href="/collections/" variant="secondary">进入观测收藏</Button>
           </div>
@@ -111,7 +155,7 @@ const featuredObservations = observations.slice(0, 3);
           </ol>
         </ArchiveFrame>
         <SkillPanel />
-        <CollectionCorner />
+        <CollectionCorner total={allObservations.length} counts={kindCounts.map((entry) => ({ label: entry.label, count: entry.count }))} />
       </aside>
     </div>
   </PageShell>
@@ -157,6 +201,37 @@ const featuredObservations = observations.slice(0, 3);
 
   .observation-grid > :global(:nth-child(3)) {
     grid-column: 1 / -1;
+  }
+
+  .kind-tally {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+  }
+
+  .kind-tally a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border: 1px solid color-mix(in srgb, var(--color-blue) 42%, var(--color-line));
+    border-radius: 999px;
+    padding: 0.26rem 0.62rem;
+    background: color-mix(in srgb, var(--color-blue) 9%, white);
+    color: var(--color-text);
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .kind-tally a:hover {
+    border-color: color-mix(in srgb, var(--color-pink) 58%, var(--color-line));
+  }
+
+  .kind-tally span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
   }
 
   .section-actions {

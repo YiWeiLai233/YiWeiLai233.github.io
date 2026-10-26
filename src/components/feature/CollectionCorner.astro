@@ -1,13 +1,27 @@
+---
+interface Props {
+  total?: number;
+  counts?: { label: string; count: number }[];
+}
+
+const { total = 0, counts = [] } = Astro.props;
+---
+
 <aside class="collection-corner vn-frame">
   <span>收藏角落</span>
   <h3>观测收藏</h3>
-  <p>整理番剧、音乐、游戏和日常灵感，让技术博客之外也保留个人兴趣的温度。</p>
-  <div class="chips">
-    <b>番剧记录</b>
-    <b>音乐循环</b>
-    <b>游戏碎片</b>
-  </div>
-  <a href="/collections/">进入观测收藏</a>
+  <p>番剧、游戏、音乐和日常碎片的具体条目，每条都有独立页面记录评分与进度。</p>
+  {counts.length > 0 && (
+    <div class="chips">
+      {counts.map((entry) => (
+        <b>
+          {entry.label}
+          <em>{entry.count}</em>
+        </b>
+      ))}
+    </div>
+  )}
+  <a href="/collections/">进入观测收藏{total > 0 ? ` · ${total} 条` : ''}</a>
 </aside>
 
 <style>
@@ -46,12 +60,23 @@
   }
 
   b {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
     border: 1px solid rgba(255, 255, 255, 0.72);
     border-radius: 999px;
     padding: 0.28rem 0.58rem;
     background: rgba(255, 255, 255, 0.72);
     color: var(--color-text);
     font-size: 0.8rem;
+  }
+
+  em {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-style: normal;
+    font-weight: 800;
   }
 
   a {

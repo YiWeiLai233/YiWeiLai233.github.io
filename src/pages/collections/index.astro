@@ -1,52 +1,132 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageShell from '@/components/layout/PageShell.astro';
 import PageVisualHero from '@/components/feature/PageVisualHero.astro';
-import ChapterMascot from '@/components/feature/ChapterMascot.astro';
 import ObservationCard from '@/components/feature/ObservationCard.astro';
 import MascotTheater from '@/components/feature/MascotTheater.astro';
 import ArchiveFrame from '@/components/ui/ArchiveFrame.astro';
-import { observations, observationKinds } from '@/data/observations';
+import { observationKinds, observationKindOrder } from '@/data/observations';
+import { getObservationHref, sortObservationsByDateDesc, formatDate } from '@/lib/content';
 
-const grouped = observations.map((item) => ({
-  ...item,
-  kindLabel: observationKinds[item.kind]
-}));
+const all = sortObservationsByDateDesc(
+  await getCollection('observations', ({ data }) => !data.draft)
+);
+
+const groups = observationKindOrder
+  .map((kind) => ({
+    kind,
+    meta: observationKinds[kind],
+    items: all.filter((item) => item.data.kind === kind)
+  }))
+  .filter((group) => group.items.length > 0);
+
+const total = all.length;
+const finished = all.filter((item) => item.data.status === 'finished').length;
+const ongoing = all.filter((item) => item.data.status === 'ongoing').length;
+const rated = all.filter((item) => item.data.rating !== undefined);
+const avgRating = rated.length
+  ? (rated.reduce((sum, item) => sum + (item.data.rating ?? 0), 0) / rated.length).toFixed(1)
+  : '';
+
+// 最近更新：跨分类取最新 3 条，用于侧栏「最近记下的」
+const recent = all.slice(0, 3);
 ---
 
-<BaseLayout title="观测收藏 | 未来观测站" description="番剧、游戏、音乐与日常灵感的个人收藏索引。">
+<BaseLayout
+  title="观测收藏 | 未来观测站"
+  description={`番剧、游戏、音乐与日常碎片的个人观测档案，共 ${total} 条记录。`}
+>
   <PageShell>
     <PageVisualHero
       title="观测收藏"
-      subtitle="整理忆丶未来的番剧观测、游戏存档、音乐循环和日常灵感，作为站点里的个人收藏区。"
+      subtitle="番剧、游戏、音乐和日常碎片的具体条目。每条都有独立页面，记录评分、进度和当时的想法。"
       image="/assets/hero-about.webp"
       alt="未来观测站收藏室和看板娘"
     />
 
     <div class="collection-layout">
       <main>
-        <ChapterMascot
-          chapter="收藏"
-          title="二次元观测清单"
-          subtitle="用轻量卡片归纳不同类型的兴趣记录，为更完整的收藏档案保留结构。"
-          variant="home"
-        />
-        <div class="collection-grid">
-          {grouped.map((item) => <ObservationCard item={item} />)}
-        </div>
+        <nav class="kind-nav" aria-label="观测分类">
+          {
+            groups.map((group) => (
+              <a href={`#${group.kind}`} class:list={['kind-chip', `accent-${group.meta.accent}`]}>
+                <strong>{group.meta.short}</strong>
+                <span>{group.items.length}</span>
+              </a>
+            ))
+          }
+        </nav>
+
+        {
+          groups.map((group) => (
+            <section class="kind-section" id={group.kind}>
+              <header class="kind-head">
+                <div>
+                  <h2>{group.meta.label}</h2>
+                  <p>{group.meta.description}</p>
+                </div>
+                <span class="kind-count">{group.items.length} 条</span>
+              </header>
+              <div class="observation-grid">
+                {group.items.map((item) => (
+                  <ObservationCard
+                    item={{
+                      title: item.data.title,
+                      summary: item.data.summary,
+                      kind: item.data.kind,
+                      status: item.data.status,
+                      rating: item.data.rating,
+                      date: item.data.date,
+                      href: getObservationHref(item)
+                    }}
+                  />
+                ))}
+              </div>
+            </section>
+          ))
+        }
+
+        {
+          groups.length === 0 && (
+            <ArchiveFrame label="空档案">
+              <h2>还没有观测记录</h2>
+              <p>在 src/content/observations/ 下新建一个 md 文件，就会出现在这里。</p>
+            </ArchiveFrame>
+          )
+        }
       </main>
 
       <aside class="collection-side">
+        <ArchiveFrame label="档案概况">
+          <h2>观测统计</h2>
+          <dl class="stats">
+            <div><dt>总条目</dt><dd>{total}</dd></div>
+            <div><dt>进行中</dt><dd>{ongoing}</dd></div>
+            <div><dt>已完成</dt><dd>{finished}</dd></div>
+            {avgRating && <div><dt>平均分</dt><dd>{avgRating}</dd></div>}
+          </dl>
+        </ArchiveFrame>
+
+        <ArchiveFrame label="最近记下">
+          <h2>最近更新</h2>
+          <ul class="recent">
+            {
+              recent.map((item) => (
+                <li>
+                  <a href={getObservationHref(item)}>{item.data.title}</a>
+                  <time datetime={item.data.date.toISOString()}>{formatDate(item.data.date)}</time>
+                </li>
+              ))
+            }
+          </ul>
+        </ArchiveFrame>
+
         <ArchiveFrame label="维护方式">
-          <h2>内容维护</h2>
-          <p>观测卡片统一维护在 `src/data/observations.ts`，首页和收藏页共用同一份数据。</p>
+          <h2>怎么加一条</h2>
+          <p>在 `src/content/observations/` 下新建 md，填 title / kind / status / date / summary，可选 rating 与 link。</p>
         </ArchiveFrame>
-        <ArchiveFrame label="分类索引">
-          <h2>观测分类</h2>
-          <div class="kind-list">
-            {grouped.map((item) => <span>{item.kindLabel}</span>)}
-          </div>
-        </ArchiveFrame>
+
         <MascotTheater />
       </aside>
     </div>
@@ -61,7 +141,100 @@ const grouped = observations.map((item) => ({
     align-items: start;
   }
 
-  .collection-grid {
+  main {
+    display: grid;
+    gap: 1.6rem;
+    min-width: 0;
+  }
+
+  .kind-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .kind-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 999px;
+    padding: 0.4rem 0.8rem;
+    background:
+      radial-gradient(circle at top right, var(--accent-soft), transparent 6rem),
+      rgba(255, 255, 255, 0.84);
+    color: var(--color-text);
+    font-size: 0.86rem;
+    text-decoration: none;
+    box-shadow: var(--shadow-card);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .kind-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-pop);
+  }
+
+  .kind-chip span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .accent-blue {
+    --accent-soft: color-mix(in srgb, var(--color-blue) 24%, transparent);
+  }
+
+  .accent-pink {
+    --accent-soft: color-mix(in srgb, var(--color-pink) 24%, transparent);
+  }
+
+  .accent-cyan {
+    --accent-soft: color-mix(in srgb, var(--color-cyan) 22%, transparent);
+  }
+
+  .accent-gold {
+    --accent-soft: color-mix(in srgb, var(--color-gold) 24%, transparent);
+  }
+
+  .kind-section {
+    display: grid;
+    gap: 0.9rem;
+    scroll-margin-top: 6rem;
+  }
+
+  .kind-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px dashed color-mix(in srgb, var(--color-line) 80%, transparent);
+    padding-bottom: 0.65rem;
+  }
+
+  .kind-head h2 {
+    margin: 0 0 0.25rem;
+    color: var(--color-text);
+    font-size: 1.3rem;
+  }
+
+  .kind-head p {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+    line-height: 1.66;
+  }
+
+  .kind-count {
+    flex-shrink: 0;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 800;
+  }
+
+  .observation-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
@@ -75,29 +248,70 @@ const grouped = observations.map((item) => ({
   .collection-side h2 {
     margin: 0 0 0.65rem;
     color: var(--color-text);
-    font-size: 1.12rem;
+    font-size: 1.1rem;
   }
 
   .collection-side p {
     margin: 0;
     color: var(--color-muted);
+    font-size: 0.9rem;
     line-height: 1.8;
   }
 
-  .kind-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+  .stats {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
   }
 
-  .kind-list span {
-    border: 1px solid rgba(255, 255, 255, 0.72);
-    border-radius: 999px;
-    padding: 0.28rem 0.58rem;
-    background: rgba(255, 255, 255, 0.72);
+  .stats div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px dashed color-mix(in srgb, var(--color-line) 70%, transparent);
+    padding-bottom: 0.35rem;
+  }
+
+  .stats dt {
+    color: var(--color-muted);
+    font-size: 0.86rem;
+  }
+
+  .stats dd {
+    margin: 0;
     color: var(--color-text);
-    font-size: 0.82rem;
-    font-weight: 800;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 900;
+  }
+
+  .recent {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .recent a {
+    color: var(--color-text);
+    font-size: 0.92rem;
+    font-weight: 750;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  .recent a:hover {
+    color: color-mix(in srgb, var(--color-blue) 70%, var(--color-ink));
+  }
+
+  .recent time {
+    display: block;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
   }
 
   @media (max-width: 980px) {
@@ -111,7 +325,7 @@ const grouped = observations.map((item) => ({
   }
 
   @media (max-width: 720px) {
-    .collection-grid,
+    .observation-grid,
     .collection-side {
       grid-template-columns: 1fr;
     }
