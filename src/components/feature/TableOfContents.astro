@@ -1,0 +1,71 @@
+---
+import type { TocItem } from '@/lib/toc';
+
+interface Props {
+  items: TocItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="toc" aria-labelledby="toc-title">
+  <h2 id="toc-title">目录</h2>
+  <ol>
+    {
+      items.map((item) => (
+        <li class:list={['toc-item', `depth-${item.depth}`]}>
+          <a href={`#${item.slug}`}>{item.text}</a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .toc {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.1rem;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(8px);
+  }
+
+  h2 {
+    margin: 0 0 0.7rem;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  ol {
+    display: grid;
+    gap: 0.42rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .depth-3 {
+    padding-left: 0.9rem;
+    border-left: 1px dashed color-mix(in srgb, var(--color-blue) 40%, var(--color-line));
+    margin-left: 0.1rem;
+  }
+
+  a {
+    display: block;
+    color: var(--color-text);
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: color-mix(in srgb, var(--color-blue) 70%, var(--color-ink));
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

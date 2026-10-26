@@ -1,32 +1,83 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageShell from '@/components/layout/PageShell.astro';
+import PostNavigation from '@/components/feature/PostNavigation.astro';
+import TableOfContents from '@/components/feature/TableOfContents.astro';
+import TagPill from '@/components/ui/TagPill.astro';
+import { formatDateLong, getTagHref } from '@/lib/content';
+import type { TocItem } from '@/lib/toc';
 
 interface Props {
   title: string;
   description: string;
   date?: Date;
   label?: string;
+  category?: string;
+  tags?: string[];
+  readingMinutes?: number;
+  toc?: TocItem[];
+  prev?: { title: string; href: string; date: Date; label: string };
+  next?: { title: string; href: string; date: Date; label: string };
 }
 
-const { title, description, date, label = '日志条目' } = Astro.props;
-const dateText = date
-  ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'long' }).format(date)
-  : '';
+const {
+  title,
+  description,
+  date,
+  label = '日志条目',
+  category,
+  tags = [],
+  readingMinutes,
+  toc = [],
+  prev,
+  next
+} = Astro.props;
+
+const dateText = date ? formatDateLong(date) : '';
+const hasAside = toc.length > 2;
 ---
 
-<BaseLayout title={`${title} | 未来观测站`} description={description}>
-  <PageShell narrow>
+<BaseLayout title={title} description={description} type="article">
+  <PageShell narrow={!hasAside}>
     <article class="content-layout anime-frame">
       <header>
-        <span>{label}</span>
+        <div class="meta-row">
+          <span class="label">{label}</span>
+          {category && <span class="category">{category}</span>}
+        </div>
         <h1>{title}</h1>
-        {dateText && <time>{dateText}</time>}
-        <p>{description}</p>
+        <div class="sub-meta">
+          {dateText && <time datetime={date?.toISOString()}>{dateText}</time>}
+          {readingMinutes && <span class="reading">约 {readingMinutes} 分钟读完</span>}
+        </div>
+        <p class="lede">{description}</p>
+        {
+          tags.length > 0 && (
+            <div class="tags">
+              {tags.map((tag) => (
+                <a class="tag-link" href={getTagHref(tag)}>
+                  <TagPill label={tag} />
+                </a>
+              ))}
+            </div>
+          )
+        }
       </header>
-      <div class="prose">
-        <slot />
+
+      <div class:list={['body-grid', { 'with-aside': hasAside }]}>
+        <div class="prose">
+          <slot />
+        </div>
+        {
+          hasAside && (
+            <aside class="toc-side">
+              <TableOfContents items={toc} />
+            </aside>
+          )
+        }
       </div>
+
+      <PostNavigation prev={prev} next={next} />
     </article>
   </PageShell>
 </BaseLayout>
@@ -43,12 +94,29 @@ const dateText = date
     padding-bottom: 1.5rem;
   }
 
-  span {
+  .meta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .label {
     color: var(--color-muted);
     font-family: var(--font-mono);
     font-size: 0.78rem;
     font-weight: 800;
     letter-spacing: 0.08em;
+  }
+
+  .category {
+    border: 1px solid color-mix(in srgb, var(--color-pink) 50%, var(--color-line));
+    border-radius: 999px;
+    padding: 0.16rem 0.55rem;
+    background: color-mix(in srgb, var(--color-pink) 14%, white);
+    color: var(--color-muted);
+    font-size: 0.74rem;
+    font-weight: 800;
   }
 
   h1 {
@@ -58,18 +126,64 @@ const dateText = date
     line-height: 1.08;
   }
 
-  time,
-  header p {
+  .sub-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
   }
 
-  header p {
-    max-width: 42rem;
+  .reading::before {
+    content: '·';
+    margin-right: 0.55rem;
+  }
+
+  .lede {
+    max-width: 44rem;
     margin: 0.8rem 0 0;
+    color: var(--color-muted);
     line-height: 1.8;
   }
 
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.95rem;
+  }
+
+  .tag-link {
+    text-decoration: none;
+    transition: transform 150ms ease;
+  }
+
+  .tag-link:hover {
+    transform: translateY(-1px);
+  }
+
+  .body-grid {
+    display: grid;
+    gap: clamp(1.2rem, 3vw, 2.2rem);
+  }
+
+  .body-grid.with-aside {
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 15rem);
+    align-items: start;
+  }
+
+  .toc-side {
+    position: sticky;
+    top: 1.5rem;
+    order: 2;
+  }
+
   .prose {
+    min-width: 0;
     color: var(--color-text);
     font-size: 1.02rem;
     line-height: 1.9;
@@ -78,6 +192,11 @@ const dateText = date
   .prose :global(h2) {
     margin-top: 2rem;
     color: var(--color-text);
+    scroll-margin-top: 1.5rem;
+  }
+
+  .prose :global(h3) {
+    scroll-margin-top: 1.5rem;
   }
 
   .prose :global(a) {
@@ -89,5 +208,16 @@ const dateText = date
     border-radius: 6px;
     background: color-mix(in srgb, var(--color-blue) 12%, white);
     padding: 0.1rem 0.32rem;
+  }
+
+  @media (max-width: 960px) {
+    .body-grid.with-aside {
+      grid-template-columns: 1fr;
+    }
+
+    .toc-side {
+      position: static;
+      order: 0;
+    }
   }
 </style>

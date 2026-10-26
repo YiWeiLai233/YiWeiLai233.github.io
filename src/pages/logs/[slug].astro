@@ -2,25 +2,60 @@
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import ContentLayout from '@/layouts/ContentLayout.astro';
-import { getEntrySlug } from '@/lib/content';
+import { getEntrySlug, getPostHref, getReadingTime, sortPostsByDateDesc } from '@/lib/content';
+import { extractToc } from '@/lib/toc';
 
 interface Props {
   post: CollectionEntry<'posts'>;
+  prev?: { title: string; href: string; date: Date; label: string };
+  next?: { title: string; href: string; date: Date; label: string };
 }
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  const posts = sortPostsByDateDesc(await getCollection('posts', ({ data }) => !data.draft));
 
-  return posts.map((post) => ({
-    params: { slug: getEntrySlug(post.id) },
-    props: { post }
-  }));
+  return posts.map((post, index) => {
+    // posts 已按日期倒序：前一条 = 更新的，后一条 = 更早的
+    const newer = posts[index - 1];
+    const older = posts[index + 1];
+
+    return {
+      params: { slug: getEntrySlug(post.id) },
+      props: {
+        post,
+        prev: older && {
+          title: older.data.title,
+          href: getPostHref(older),
+          date: older.data.date,
+          label: '更早一篇'
+        },
+        next: newer && {
+          title: newer.data.title,
+          href: getPostHref(newer),
+          date: newer.data.date,
+          label: '更新一篇'
+        }
+      }
+    };
+  });
 }
 
-const { post } = Astro.props;
+const { post, prev, next } = Astro.props;
 const { Content } = await post.render();
+const { minutes } = getReadingTime(post.body ?? '');
+const toc = extractToc(post.body ?? '');
 ---
 
-<ContentLayout title={post.data.title} description={post.data.summary} date={post.data.date}>
+<ContentLayout
+  title={post.data.title}
+  description={post.data.summary}
+  date={post.data.date}
+  category={post.data.category}
+  tags={post.data.tags}
+  readingMinutes={minutes}
+  toc={toc}
+  prev={prev}
+  next={next}
+>
   <Content />
 </ContentLayout>
