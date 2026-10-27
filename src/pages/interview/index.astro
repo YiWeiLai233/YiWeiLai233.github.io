@@ -1,0 +1,261 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageShell from '@/components/layout/PageShell.astro';
+import PageVisualHero from '@/components/feature/PageVisualHero.astro';
+import ChapterMascot from '@/components/feature/ChapterMascot.astro';
+import ArchiveFrame from '@/components/ui/ArchiveFrame.astro';
+import InterviewTrainer from '@/components/islands/InterviewTrainer.vue';
+import { loadInterviewBank } from '@/lib/interview';
+
+// 构建期读一次题库：只用于渲染这一页的静态部分（统计、速记区、目录），
+// 题目本体由 island 运行时 fetch /data/interview-bank.json，不进 HTML。
+const bank = await loadInterviewBank();
+
+const cheatsheet = bank.cheatsheet;
+const appendix = bank.appendix;
+---
+
+<BaseLayout
+  title="面试刷题 | 未来观测站"
+  description={`运维 / SRE 面试题库刷题页，共 ${bank.total} 题，支持按章节与难度筛选、随机出题不重复。`}
+>
+  <PageShell>
+    <PageVisualHero
+      title="面试刷题"
+      subtitle="运维与 SRE 面试八股，随机抽题、点开看答案、下一题继续。洗完一轮自动重洗，筛选范围内不会重复。"
+      image="/assets/hero-logs.webp"
+      alt="未来观测站看板娘整理面试题库"
+    />
+
+    <div class="quiz-layout">
+      <main>
+        <ChapterMascot
+          chapter="刷题"
+          title="题库练习"
+          subtitle="左右方向键切题，空格看答案。答完一轮自动重洗，不用手动重置。"
+          variant="logs"
+        />
+
+        <InterviewTrainer client:load />
+      </main>
+
+      <aside class="quiz-side">
+        <ArchiveFrame label="题库概况">
+          <h2>这本题库</h2>
+          <dl class="stats">
+            <div><dt>总题数</dt><dd>{bank.total}</dd></div>
+            {
+              bank.difficulties.map((item) => (
+                <div>
+                  <dt>{item.label}难度</dt>
+                  <dd>{item.count}</dd>
+                </div>
+              ))
+            }
+            <div><dt>章节</dt><dd>{bank.sections.length}</dd></div>
+          </dl>
+          <p class="source">源文件：{bank.source}</p>
+        </ArchiveFrame>
+
+        <ArchiveFrame label="章节分布">
+          <h2>按章节刷</h2>
+          <ul class="section-list">
+            {
+              bank.sections.map((section) => (
+                <li>
+                  <span>{section.name}</span>
+                  <span class="count">{section.count}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </ArchiveFrame>
+
+        <ArchiveFrame label="速记">
+          <h2>考前速记</h2>
+          <div class="memo">
+            {
+              cheatsheet.map((entry) => (
+                <details>
+                  <summary>{entry.title}</summary>
+                  <div class="memo-body" set:html={entry.html} />
+                </details>
+              ))
+            }
+          </div>
+        </ArchiveFrame>
+
+        {
+          appendix.map((entry) => (
+            <ArchiveFrame label="附">
+              <h2>{entry.title}</h2>
+              <div class="memo-body" set:html={entry.html} />
+            </ArchiveFrame>
+          ))
+        }
+      </aside>
+    </div>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .quiz-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 20rem);
+    gap: clamp(1rem, 2vw, 1.5rem);
+    align-items: start;
+  }
+
+  main {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .quiz-side {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .quiz-side h2 {
+    margin: 0 0 0.85rem;
+    color: var(--color-text);
+    font-size: 1.1rem;
+  }
+
+  .stats {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+  }
+
+  .stats div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px dashed color-mix(in srgb, var(--color-line) 70%, transparent);
+    padding-bottom: 0.32rem;
+  }
+
+  .stats dt {
+    color: var(--color-muted);
+    font-size: 0.84rem;
+  }
+
+  .stats dd {
+    margin: 0;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 900;
+  }
+
+  .source {
+    margin: 0.7rem 0 0;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    line-height: 1.6;
+    word-break: break-all;
+  }
+
+  .section-list {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .section-list li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: var(--color-muted);
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+
+  .section-list .count {
+    flex-shrink: 0;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 800;
+  }
+
+  .memo {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .memo details {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 0.6rem;
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .memo summary {
+    color: var(--color-text);
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .memo-body {
+    margin-top: 0.5rem;
+    color: var(--color-muted);
+    font-size: 0.84rem;
+    line-height: 1.75;
+  }
+
+  .memo-body :global(p) {
+    margin: 0 0 0.5rem;
+  }
+
+  .memo-body :global(ul),
+  .memo-body :global(ol) {
+    margin: 0 0 0.5rem;
+    padding-left: 1.15rem;
+  }
+
+  .memo-body :global(code) {
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--color-blue) 12%, white);
+    padding: 0.06rem 0.28rem;
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+  }
+
+  .memo-body :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+
+  .memo-body :global(th),
+  .memo-body :global(td) {
+    border: 1px solid var(--color-line);
+    padding: 0.28rem 0.42rem;
+    text-align: left;
+  }
+
+  @media (max-width: 980px) {
+    .quiz-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .quiz-side {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .quiz-side {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
