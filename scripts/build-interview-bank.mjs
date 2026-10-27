@@ -8,8 +8,12 @@
  * 3. 产出放 public/ 而不是被 island import，用户点「开始刷题」时才 fetch，
  *    首页 HTML 与 JS 体积零增长。
  *
+ * 多文件合并：SOURCES 里的文件按顺序读，共用同一个 slugger 和同一份题目队列，
+ * 全部读完后再统一重排成 1..N 的全局题号——每个文件自己都是从 Q1 开始的，
+ * 不重排就会出现重复的 q1、q2。
+ *
  * 关键坑：题库里有 9 行以 `#` 开头的 Shell / PromQL 注释位于代码围栏内部
- * （第 477、480、483、486、1448、1451、1454、1457、1460 行）。
+ * （运维面试八股文-全面版.md 的第 477、480、483、486、1448、1451、1454、1457、1460 行）。
  * 因此切分必须先走「是否在 fence 内」的状态机，绝不能直接用行级正则匹配 `^##`。
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -19,7 +23,17 @@ import GithubSlugger from 'github-slugger';
 import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SOURCE = path.join(root, 'src/data/interview/运维面试八股文-全面版.md');
+
+/**
+ * 题库源文件，按数组顺序合并进同一份 JSON。
+ *
+ * 为什么是显式列表而不是扫目录：题目编号是在合并后连续重排的（第二份文件的 Q1
+ * 会变成 Q231），扫目录会让文件名排序变化直接改变全站题号。新增题库时必须显式
+ * 追加在这里，顺带把「题号为什么变了」变成一个需要 review 的动作。
+ */
+const SOURCES = ['src/data/interview/运维面试八股文-全面版.md', 'src/data/interview/linux-ops.md'].map(
+  (file) => path.join(root, file)
+);
 const OUTPUT = path.join(root, 'public/data/interview-bank.json');
 
 const DIFFICULTIES = [
@@ -28,8 +42,12 @@ const DIFFICULTIES = [
   { key: 'senior', label: '高', mark: '【高】' }
 ];
 
-/** 顶层章节里，这两类是查阅型内容，不进刷题池 */
-const CHEATSHEET_PREFIX = '十五、';
+/**
+ * 顶层章节里，这两类是查阅型内容，不进刷题池。
+ * 速记卡按「标题里含 速记」判断，不能按章节序号前缀判断：每个题库文件各自编号，
+ * 第一份的速记卡是「十五、」，Linux 题库里「十五、」却是正经题目章节。
+ */
+const isCheatsheetTitle = (title) => title.includes('速记');
 const APPENDIX_PREFIX = '附：';
 
 /**
@@ -138,10 +156,6 @@ function parseQuestionHeading(heading) {
 }
 
 async function main() {
-  const raw = await readFile(SOURCE, 'utf8');
-  const annotated = annotateFences(raw.split(/\r?\n/));
-  const sections = splitSections(annotated);
-
   const processor = await createMarkdownProcessor({
     gfm: true,
     smartypants: true,
@@ -161,75 +175,84 @@ async function main() {
     return html.replace(/^<p>/, '').replace(/<\/p>$/, '').trim();
   };
 
+  // 多个源文件共用同一个 slugger：章节 slug 全局唯一，不会因为两个文件都有
+  // 「一、」开头的章节而撞车（撞了会自动加 -1 后缀）。
   const slugger = new GithubSlugger();
   const questions = [];
   const sectionMeta = [];
   const cheatsheet = [];
   const appendix = [];
 
-  for (const section of sections) {
-    const { name } = parseSectionTitle(section.title);
-    if (name === '目录' || section.title === '目录') continue;
+  for (const source of SOURCES) {
+    const raw = await readFile(source, 'utf8');
+    const sections = splitSections(annotateFences(raw.split(/\r?\n/)));
 
-    const isCheatsheet = section.title.startsWith(CHEATSHEET_PREFIX);
-    const isAppendix = section.title.startsWith(APPENDIX_PREFIX);
-    const blocks = splitBlocks(section);
+    for (const section of sections) {
+      const { name } = parseSectionTitle(section.title);
+      if (name === '目录' || section.title === '目录') continue;
 
-    if (isCheatsheet || isAppendix) {
-      for (const block of blocks) {
-        const body = block.lines.map((line) => line.text).join('\n');
-        if (!body.trim()) continue;
-        const entry = {
-          slug: slugger.slug(block.heading),
-          title: block.heading,
-          html: await render(body)
-        };
-        if (isCheatsheet) cheatsheet.push(entry);
-        else appendix.push(entry);
-      }
-      continue;
-    }
+      const isCheatsheet = isCheatsheetTitle(section.title);
+      const isAppendix = section.title.startsWith(APPENDIX_PREFIX);
+      const blocks = splitBlocks(section);
 
-    const sectionSlug = slugger.slug(name);
-    let count = 0;
-
-    for (const block of blocks) {
-      const parsed = parseQuestionHeading(block.heading);
-      if (!parsed) continue;
-
-      const body = block.lines.map((line) => line.text).join('\n');
-      questions.push({
-        id: `q${parsed.no}`,
-        no: parsed.no,
-        section: name,
-        sectionSlug,
-        difficulty: parsed.difficulty,
-        question: parsed.title,
-        questionHtml: await renderInline(parsed.title),
-        answerHtml: await render(body),
-        hasCode: /^\s*```/m.test(body)
-      });
-      count += 1;
-    }
-
-    if (count > 0) {
-      sectionMeta.push({
-        slug: sectionSlug,
-        name,
-        count,
-        byDifficulty: {
-          junior: questions.filter((q) => q.sectionSlug === sectionSlug && q.difficulty === 'junior').length,
-          middle: questions.filter((q) => q.sectionSlug === sectionSlug && q.difficulty === 'middle').length,
-          senior: questions.filter((q) => q.sectionSlug === sectionSlug && q.difficulty === 'senior').length
+      if (isCheatsheet || isAppendix) {
+        for (const block of blocks) {
+          const body = block.lines.map((line) => line.text).join('\n');
+          if (!body.trim()) continue;
+          const entry = {
+            slug: slugger.slug(block.heading),
+            title: block.heading,
+            html: await render(body)
+          };
+          if (isCheatsheet) cheatsheet.push(entry);
+          else appendix.push(entry);
         }
-      });
+        continue;
+      }
+
+      const sectionSlug = slugger.slug(name);
+      // 每个文件里的 Q 号都是从 1 重新开始的，所以先只记原号，
+      // 等所有文件读完再统一重排成全局连续编号。
+      const byDifficulty = { junior: 0, middle: 0, senior: 0 };
+      let count = 0;
+
+      for (const block of blocks) {
+        const parsed = parseQuestionHeading(block.heading);
+        if (!parsed) continue;
+
+        const body = block.lines.map((line) => line.text).join('\n');
+        questions.push({
+          id: '',
+          no: 0,
+          sourceNo: parsed.no,
+          section: name,
+          sectionSlug,
+          difficulty: parsed.difficulty,
+          question: parsed.title,
+          questionHtml: await renderInline(parsed.title),
+          answerHtml: await render(body),
+          hasCode: /^\s*```/m.test(body)
+        });
+        byDifficulty[parsed.difficulty] += 1;
+        count += 1;
+      }
+
+      if (count > 0) {
+        sectionMeta.push({ slug: sectionSlug, name, count, byDifficulty });
+      }
     }
   }
 
-  questions.sort((a, b) => a.no - b.no);
+  // 题目按「文件顺序 → 章节顺序 → 原 Q 号顺序」入队，重排后即全局 1..N 连续编号，
+  // 这样 id 唯一、跨文件也不会有 q1 撞车。
+  questions.forEach((question, index) => {
+    question.no = index + 1;
+    question.id = `q${index + 1}`;
+    delete question.sourceNo;
+  });
 
   const bank = {
-    source: path.basename(SOURCE),
+    source: SOURCES.map((source) => path.basename(source)).join(' + '),
     total: questions.length,
     difficulties: DIFFICULTIES.map((item) => ({
       key: item.key,
