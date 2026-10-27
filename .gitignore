@@ -5,3 +5,7 @@ dist/
 .env.*
 !.env.example
 npm-debug.log*
+
+# 题库派生文件：由 scripts/build-interview-bank.mjs 在 dev/build 前生成，
+# 真相是 src/data/interview/*.md，不入库以免每次改题库都带出几千行 diff。
+public/data/interview-bank.json

@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "bank": "node scripts/build-interview-bank.mjs",
+    "predev": "npm run bank",
     "dev": "astro dev --host 127.0.0.1",
+    "prebuild": "npm run bank",
     "build": "astro check && astro build",
     "preview": "astro preview --host 127.0.0.1",
     "check": "astro check"
