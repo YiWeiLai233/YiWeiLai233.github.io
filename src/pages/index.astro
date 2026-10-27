@@ -13,6 +13,7 @@ import ObservationCard from '@/components/feature/ObservationCard.astro';
 import MascotTheater from '@/components/feature/MascotTheater.astro';
 import ArchiveFrame from '@/components/ui/ArchiveFrame.astro';
 import Button from '@/components/ui/Button.astro';
+import InterviewTrainer from '@/components/islands/InterviewTrainer.vue';
 import { observationKinds, observationKindOrder } from '@/data/observations';
 import {
   getEntrySlug,
@@ -118,6 +119,21 @@ const kindCounts = observationKindOrder
 
         <section class="home-section">
           <ChapterMascot
+            chapter="刷题"
+            title="面试刷题"
+            subtitle="运维 / SRE 面试八股随机抽题，点开看答案，下一题继续。洗完一轮自动重洗。"
+            variant="home"
+          />
+          <div class="quiz-frame">
+            <InterviewTrainer client:visible compact />
+          </div>
+          <div class="section-actions">
+            <Button href="/interview/" variant="secondary">进刷题页完整刷</Button>
+          </div>
+        </section>
+
+        <section class="home-section">
+          <ChapterMascot
             chapter="日志"
             title="开发日志"
             subtitle="沉淀技术选择、问题排查、迭代记录和阶段复盘。"
@@ -191,6 +207,15 @@ const kindCounts = observationKindOrder
   .post-list {
     display: grid;
     gap: 0.85rem;
+  }
+
+  .quiz-frame {
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.1rem 1.05rem;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 253, 255, 0.86)),
+      var(--color-paper);
+    box-shadow: var(--shadow-card);
   }
 
   .observation-grid {
