@@ -15,6 +15,7 @@ export const site = {
     { href: '/logs/', label: '开发日志' },
     { href: '/tags/', label: '标签' },
     { href: '/collections/', label: '观测收藏' },
+    { href: '/interview/', label: '面试刷题' },
     { href: '/about/', label: '站点档案' }
   ],
   hero: {
