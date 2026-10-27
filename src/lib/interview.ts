@@ -6,7 +6,7 @@ import path from 'node:path';
  *
  * 题库由 scripts/build-interview-bank.mjs 在 dev/build 前生成到 public/data/ 下。
  * 这里只在构建期读取（页面在 SSG 阶段解析），运行时由 island 自己 fetch，
- * 所以首页 HTML 不会因为 165 KB 的题库而膨胀。
+ * 所以首页 HTML 不会因为几百 KB 的题库而膨胀。
  */
 export type Difficulty = 'junior' | 'middle' | 'senior';
 
@@ -25,19 +25,34 @@ export interface InterviewQuestion {
 export interface InterviewSection {
   slug: string;
   name: string;
+  /**
+   * 所属题库分组（如「Kubernetes」「数据库」）。
+   * 六份题库加起来接近 90 个章节，平铺成一排筛选 chip 无法用，前端按它收一层。
+   */
+  group: string;
   count: number;
   byDifficulty: Record<Difficulty, number>;
+}
+
+/** 题库分组：靠 group 把章节收成一层，避免章节 chip 铺满整屏。 */
+export interface InterviewGroup {
+  name: string;
+  count: number;
+  sections: number;
 }
 
 export interface InterviewEntry {
   slug: string;
   title: string;
+  /** 所属题库分组：多份题库的速记小节会重名（「必记参数」「一句话速答」各两份） */
+  group: string;
   html: string;
 }
 
 export interface InterviewBank {
   source: string;
   total: number;
+  groups: InterviewGroup[];
   difficulties: { key: Difficulty; label: string; count: number }[];
   sections: InterviewSection[];
   questions: InterviewQuestion[];
@@ -54,7 +69,7 @@ export const difficultyLabel: Record<Difficulty, string> = {
 /**
  * 题库构建期文件路径。
  *
- * 注意这里是 public/data 而不是 src/：题库 165 KB 只应该在运行时按需 fetch，
+ * 注意这里是 public/data 而不是 src/：题库体积不小，只应该在运行时按需 fetch，
  * 不能让 Astro 把它当模块打包，也不能让首页 HTML 内联一份。
  */
 export const interviewBankFile = path.join(process.cwd(), 'public', 'data', 'interview-bank.json');

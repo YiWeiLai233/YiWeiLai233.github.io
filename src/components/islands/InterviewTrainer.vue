@@ -14,6 +14,7 @@ withDefaults(
 
 type FilterState = {
   sections: string[];
+  groups: string[];
   difficulties: Difficulty[];
   answered: number;
 };
@@ -38,6 +39,7 @@ const queue = shallowRef<InterviewQuestion[]>([]);
 const cursor = ref(0);
 
 const activeSections = ref<string[]>([]);
+const activeGroups = ref<string[]>([]);
 const activeDifficulties = ref<Difficulty[]>(['junior', 'middle', 'senior']);
 const answered = ref(0);
 
@@ -63,6 +65,19 @@ const difficultyText: Record<Difficulty, string> = {
 
 const sectionCounts = computed(() => bank.value?.sections ?? []);
 const difficultyOptions = computed(() => bank.value?.difficulties ?? []);
+const groupOptions = computed(() => bank.value?.groups ?? []);
+
+/**
+ * 当前显示在筛选条里的章节。
+ *
+ * 六份题库合起来接近九十个章节，一次全摊开会把筛选区撑成一堵墙，
+ * 所以先选题库分组（不选＝全部题库），章节 chip 只显示选中分组里的。
+ */
+const visibleSections = computed(() => {
+  const groups = activeGroups.value;
+  if (groups.length === 0) return sectionCounts.value;
+  return sectionCounts.value.filter((section) => groups.includes(section.group));
+});
 
 function shuffle<T>(items: T[]): T[] {
   const list = [...items];
@@ -90,13 +105,27 @@ function applyFilters() {
   if (!bank.value) return;
   const sections = activeSections.value;
   const difficulties = activeDifficulties.value;
+  const groups = activeGroups.value;
 
   const picked = bank.value.questions.filter((item) => {
+    const groupOk = groups.length === 0 || groups.includes(sectionGroup(item.sectionSlug));
     const sectionOk = sections.length === 0 || sections.includes(item.sectionSlug);
-    return sectionOk && difficulties.includes(item.difficulty);
+    return groupOk && sectionOk && difficulties.includes(item.difficulty);
   });
 
   rebuild(shuffle(picked));
+}
+
+function sectionGroup(slug: string): string {
+  const matched = sectionCounts.value.find((item) => item.slug === slug);
+  return matched?.group ?? '';
+}
+
+function toggleGroup(name: string) {
+  const list = activeGroups.value;
+  activeGroups.value = list.includes(name)
+    ? list.filter((item) => item !== name)
+    : [...list, name];
 }
 
 function toggleSection(slug: string) {
@@ -116,6 +145,7 @@ function toggleDifficulty(key: Difficulty) {
 }
 
 function resetFilters() {
+  activeGroups.value = [];
   activeSections.value = [];
   activeDifficulties.value = ['junior', 'middle', 'senior'];
 }
@@ -179,6 +209,7 @@ function saveState() {
       STORAGE_KEY,
       JSON.stringify({
         sections: activeSections.value,
+        groups: activeGroups.value,
         difficulties: activeDifficulties.value,
         answered: answered.value
       })
@@ -199,6 +230,7 @@ function restoreState() {
     if (!raw) return;
     const saved = JSON.parse(raw) as Partial<FilterState> & { answered?: number };
     if (Array.isArray(saved.sections)) activeSections.value = saved.sections;
+    if (Array.isArray(saved.groups)) activeGroups.value = saved.groups;
     if (Array.isArray(saved.difficulties) && saved.difficulties.length > 0) {
       activeDifficulties.value = saved.difficulties;
     }
@@ -224,7 +256,7 @@ async function load() {
   }
 }
 
-watch([activeSections, activeDifficulties], () => {
+watch([activeSections, activeGroups, activeDifficulties], () => {
   if (!bank.value) return;
   applyFilters();
   saveState();
@@ -276,9 +308,22 @@ onBeforeUnmount(() => {
           </button>
         </div>
         <div class="filter-row">
+          <span class="filter-label">题库</span>
+          <button
+            v-for="group in groupOptions"
+            :key="group.name"
+            type="button"
+            :class="['chip', { 'is-on': activeGroups.includes(group.name) }]"
+            @click="toggleGroup(group.name)"
+          >
+            {{ group.name }}<span>{{ group.count }}</span>
+          </button>
+          <button type="button" class="chip is-reset" @click="resetFilters">全部题库</button>
+        </div>
+        <div class="filter-row">
           <span class="filter-label">章节</span>
           <button
-            v-for="section in sectionCounts"
+            v-for="section in visibleSections"
             :key="section.slug"
             type="button"
             :class="['chip', { 'is-on': activeSections.includes(section.slug) }]"
@@ -286,7 +331,7 @@ onBeforeUnmount(() => {
           >
             {{ section.name }}<span>{{ section.count }}</span>
           </button>
-          <button type="button" class="chip is-reset" @click="resetFilters">全部章节</button>
+          <button type="button" class="chip is-reset" @click="activeSections = []">全部章节</button>
         </div>
       </div>
 

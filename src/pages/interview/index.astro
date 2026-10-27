@@ -17,12 +17,12 @@ const appendix = bank.appendix;
 
 <BaseLayout
   title="面试刷题 | 未来观测站"
-  description={`运维 / SRE 面试题库刷题页，共 ${bank.total} 题，支持按章节与难度筛选、随机出题不重复。`}
+  description={`运维 / SRE 面试题库刷题页，共 ${bank.total} 题，覆盖${bank.groups.map((group) => group.name).join('、')}，支持按题库与难度筛选、随机出题不重复。`}
 >
   <PageShell>
     <PageVisualHero
       title="面试刷题"
-      subtitle="运维与 SRE 面试八股，随机抽题、点开看答案、下一题继续。洗完一轮自动重洗，筛选范围内不会重复。"
+      subtitle={`${bank.groups.length} 套题库 · ${bank.total} 题，随机抽题、点开看答案、下一题继续。洗完一轮自动重洗，筛选范围内不会重复。`}
       image="/assets/hero-logs.webp"
       alt="未来观测站看板娘整理面试题库"
     />
@@ -52,6 +52,7 @@ const appendix = bank.appendix;
                 </div>
               ))
             }
+            <div><dt>题库</dt><dd>{bank.groups.length}</dd></div>
             <div><dt>章节</dt><dd>{bank.sections.length}</dd></div>
           </dl>
           <p class="source">源文件：{bank.source}</p>
@@ -59,16 +60,28 @@ const appendix = bank.appendix;
 
         <ArchiveFrame label="章节分布">
           <h2>按章节刷</h2>
-          <ul class="section-list">
+          <div class="group-list">
             {
-              bank.sections.map((section) => (
-                <li>
-                  <span>{section.name}</span>
-                  <span class="count">{section.count}</span>
-                </li>
+              bank.groups.map((group) => (
+                <details class="group" open={bank.groups.length <= 1}>
+                  <summary>
+                    <span>{group.name}</span>
+                    <span class="count">{group.count}</span>
+                  </summary>
+                  <ul class="section-list">
+                    {bank.sections
+                      .filter((section) => section.group === group.name)
+                      .map((section) => (
+                        <li>
+                          <span>{section.name}</span>
+                          <span class="count">{section.count}</span>
+                        </li>
+                      ))}
+                  </ul>
+                </details>
               ))
             }
-          </ul>
+          </div>
         </ArchiveFrame>
 
       </aside>
@@ -77,14 +90,25 @@ const appendix = bank.appendix;
     <section class="cheat">
       <ArchiveFrame label="速记">
         <h2>考前速记</h2>
-        <div class="memo">
+        <div class="memo-groups">
           {
-            cheatsheet.map((entry) => (
-              <details>
-                <summary>{entry.title}</summary>
-                <div class="memo-body" set:html={entry.html} />
-              </details>
-            ))
+            bank.groups.map((group) => {
+              const entries = cheatsheet.filter((entry) => entry.group === group.name);
+              if (entries.length === 0) return null;
+              return (
+                <div class="memo-group">
+                  <p class="memo-group-title">{group.name}</p>
+                  <div class="memo">
+                    {entries.map((entry) => (
+                      <details>
+                        <summary>{entry.title}</summary>
+                        <div class="memo-body" set:html={entry.html} />
+                      </details>
+                    ))}
+                  </div>
+                </div>
+              );
+            })
           }
         </div>
       </ArchiveFrame>
@@ -163,6 +187,41 @@ const appendix = bank.appendix;
     word-break: break-all;
   }
 
+  .group-list {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .group {
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 0.6rem;
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .group > summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: var(--color-text);
+    font-size: 0.84rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .group[open] > summary {
+    margin-bottom: 0.42rem;
+  }
+
+  .group > summary .count {
+    flex-shrink: 0;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 800;
+  }
+
   .section-list {
     display: grid;
     gap: 0.4rem;
@@ -193,6 +252,20 @@ const appendix = bank.appendix;
     display: grid;
     gap: clamp(1rem, 2vw, 1.5rem);
     margin-top: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .memo-groups {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .memo-group-title {
+    margin: 0 0 0.45rem;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
   }
 
   .memo {
