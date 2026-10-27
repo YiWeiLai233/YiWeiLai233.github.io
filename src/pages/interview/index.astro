@@ -71,30 +71,33 @@ const appendix = bank.appendix;
           </ul>
         </ArchiveFrame>
 
-        <ArchiveFrame label="速记">
-          <h2>考前速记</h2>
-          <div class="memo">
-            {
-              cheatsheet.map((entry) => (
-                <details>
-                  <summary>{entry.title}</summary>
-                  <div class="memo-body" set:html={entry.html} />
-                </details>
-              ))
-            }
-          </div>
-        </ArchiveFrame>
-
-        {
-          appendix.map((entry) => (
-            <ArchiveFrame label="附">
-              <h2>{entry.title}</h2>
-              <div class="memo-body" set:html={entry.html} />
-            </ArchiveFrame>
-          ))
-        }
       </aside>
     </div>
+
+    <section class="cheat">
+      <ArchiveFrame label="速记">
+        <h2>考前速记</h2>
+        <div class="memo">
+          {
+            cheatsheet.map((entry) => (
+              <details>
+                <summary>{entry.title}</summary>
+                <div class="memo-body" set:html={entry.html} />
+              </details>
+            ))
+          }
+        </div>
+      </ArchiveFrame>
+
+      {
+        appendix.map((entry) => (
+          <ArchiveFrame label="附">
+            <h2>{entry.title}</h2>
+            <div class="memo-body" set:html={entry.html} />
+          </ArchiveFrame>
+        ))
+      }
+    </section>
   </PageShell>
 </BaseLayout>
 
@@ -186,9 +189,17 @@ const appendix = bank.appendix;
     font-weight: 800;
   }
 
+  .cheat {
+    display: grid;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin-top: clamp(1rem, 2vw, 1.5rem);
+  }
+
   .memo {
     display: grid;
-    gap: 0.45rem;
+    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(21rem, 100%), 1fr));
+    align-items: start;
   }
 
   .memo details {
