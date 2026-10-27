@@ -17,13 +17,22 @@ type FilterState = {
   groups: string[];
   difficulties: Difficulty[];
   answered: number;
+  failedIds: string[];
 };
 
 const bank = ref<InterviewBank | null>(null);
 const loading = ref(false);
 const loadError = ref('');
 const revealed = ref(false);
-const failed = ref(false);
+
+/**
+ * 「这题不会」标记存的是题目 id 集合，不是一个布尔值。
+ *
+ * 之前这里是个 ref(false)，切题和刷新都会把它重置——标记过完全不留痕。
+ * 存 id 集合才能跨题、跨会话记住标了哪些题，也才能把标记卡片列出来。
+ */
+const failedIds = ref<string[]>([]);
+const reviewHint = ref('');
 
 /**
  * 出题队列：当前这一轮还没出过的题。
@@ -56,6 +65,22 @@ const progressText = computed(() => {
 });
 
 const canPrev = computed(() => cursor.value > 0);
+
+const failed = computed(() =>
+  current.value ? failedIds.value.includes(current.value.id) : false
+);
+
+/**
+ * 标记卡片里列出的题目。
+ *
+ * 按题号排而不是按标记顺序：这是张「回看清单」，按题库原顺序翻更顺。
+ * 题库还没加载完时 bank 为空，直接给空数组，模板那边不用判空。
+ */
+const failedQuestions = computed<InterviewQuestion[]>(() => {
+  const list = bank.value?.questions ?? [];
+  const marked = new Set(failedIds.value);
+  return list.filter((item) => marked.has(item.id)).sort((left, right) => left.no - right.no);
+});
 
 const difficultyText: Record<Difficulty, string> = {
   junior: '初',
@@ -98,7 +123,6 @@ function rebuild(questions: InterviewQuestion[]) {
   queue.value = questions;
   cursor.value = 0;
   revealed.value = false;
-  failed.value = false;
 }
 
 function applyFilters() {
@@ -170,7 +194,6 @@ function next() {
     cursor.value += 1;
   }
   revealed.value = false;
-  failed.value = false;
   saveState();
 }
 
@@ -178,12 +201,49 @@ function prev() {
   if (cursor.value === 0) return;
   cursor.value -= 1;
   revealed.value = false;
-  failed.value = false;
   saveState();
 }
 
 function markFailed() {
-  failed.value = !failed.value;
+  const question = current.value;
+  if (!question) return;
+  const list = failedIds.value;
+  // 再点一次取消标记，避免误点后没法撤销
+  failedIds.value = list.includes(question.id)
+    ? list.filter((id) => id !== question.id)
+    : [...list, question.id];
+  saveState();
+}
+
+function unmarkFailed(id: string) {
+  failedIds.value = failedIds.value.filter((item) => item !== id);
+  saveState();
+}
+
+function clearFailed() {
+  failedIds.value = [];
+  reviewHint.value = '';
+  saveState();
+}
+
+/**
+ * 标记卡片里的题干是纯文本，去掉反引号再显示。
+ * 卡片里一行只放一句，没必要为几个命令名再套一层 code 样式。
+ */
+function plainQuestion(text: string): string {
+  return text.replace(/`/g, '');
+}
+
+function reviewFailed(id: string) {
+  // 从标记卡片跳回去：在当前队列里能找到就跳过去，找不到（被筛选掉了）就提示一下
+  const index = queue.value.findIndex((item) => item.id === id);
+  if (index === -1) {
+    reviewHint.value = '这题不在当前筛选范围里，先放宽难度或章节再找它。';
+    return;
+  }
+  reviewHint.value = '';
+  cursor.value = index;
+  revealed.value = true;
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -211,7 +271,8 @@ function saveState() {
         sections: activeSections.value,
         groups: activeGroups.value,
         difficulties: activeDifficulties.value,
-        answered: answered.value
+        answered: answered.value,
+        failedIds: failedIds.value
       })
     );
   } catch {
@@ -220,7 +281,7 @@ function saveState() {
 }
 
 /**
- * 只恢复筛选项和「已刷多少题」这种跨会话有意义的状态。
+ * 只恢复筛选项、「已刷多少题」和「标记不会」的题目 id 这种跨会话有意义的状态。
  * 出题位置不恢复：每次进页面队列都会重洗，硬把 cursor 套回去会错位。
  */
 function restoreState() {
@@ -235,6 +296,9 @@ function restoreState() {
       activeDifficulties.value = saved.difficulties;
     }
     if (typeof saved.answered === 'number') answered.value = saved.answered;
+    if (Array.isArray(saved.failedIds)) {
+      failedIds.value = saved.failedIds.filter((id): id is string => typeof id === 'string');
+    }
   } catch {
     // 存档损坏就当没有，不影响刷题
   }
@@ -371,6 +435,38 @@ onBeforeUnmount(() => {
             下一题 <kbd>→</kbd>
           </button>
         </footer>
+      </article>
+
+      <article v-if="failedQuestions.length > 0" class="mark-card">
+        <header class="mark-head">
+          <p class="mark-title">
+            我标记不会的题 <span class="mark-count">{{ failedQuestions.length }}</span>
+          </p>
+          <button type="button" class="ghost mark-clear" @click="clearFailed">
+            清空标记
+          </button>
+        </header>
+        <p v-if="reviewHint" class="mark-hint">{{ reviewHint }}</p>
+        <ul class="mark-list">
+          <li v-for="item in failedQuestions" :key="item.id" class="mark-item">
+            <button type="button" class="mark-jump" @click="reviewFailed(item.id)">
+              <span class="mark-no">Q{{ item.no }}</span>
+              <span class="mark-question">{{ plainQuestion(item.question) }}</span>
+              <span :class="['level', `level-${item.difficulty}`]">
+                {{ difficultyText[item.difficulty] }}
+              </span>
+            </button>
+            <button
+              type="button"
+              class="mark-remove"
+              :title="`取消标记 Q${item.no}`"
+              @click="unmarkFailed(item.id)"
+            >
+              ×
+            </button>
+          </li>
+        </ul>
+        <p class="mark-foot">标记只存在这台机器的浏览器里，换设备不会同步。</p>
       </article>
     </template>
   </section>
@@ -711,6 +807,139 @@ kbd {
   background: rgba(255, 255, 255, 0.7);
   font-family: var(--font-mono);
   font-size: 0.68rem;
+}
+
+/* 标记卡片：跟题目卡分开一张，避免和当前题混在一起看串 */
+.mark-card {
+  display: grid;
+  gap: 0.6rem;
+  border: 1px dashed color-mix(in srgb, var(--color-pink) 42%, var(--color-line));
+  border-radius: var(--radius-md);
+  padding: 0.8rem 0.9rem;
+  background: color-mix(in srgb, var(--color-pink) 6%, white);
+}
+
+.mark-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.mark-title {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-text);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.mark-count {
+  border-radius: 999px;
+  padding: 0.04rem 0.42rem;
+  background: color-mix(in srgb, var(--color-pink) 22%, white);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.mark-clear {
+  padding: 0.24rem 0.6rem;
+  font-size: 0.74rem;
+}
+
+.mark-hint {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-pink) 40%, var(--color-text));
+  font-size: 0.78rem;
+}
+
+.mark-list {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  /* 标记得多了不该把首页那张卡撑到半屏，超出就在卡片内部滚动 */
+  max-height: 15rem;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.mark-item {
+  display: flex;
+  align-items: stretch;
+  gap: 0.3rem;
+}
+
+.mark-jump {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  padding: 0.34rem 0.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--color-text);
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.mark-jump:hover {
+  border-color: color-mix(in srgb, var(--color-pink) 55%, var(--color-line));
+  background: white;
+}
+
+.mark-no {
+  flex-shrink: 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.mark-question {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.mark-jump .level {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.mark-remove {
+  flex-shrink: 0;
+  width: 1.9rem;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
+}
+
+.mark-remove:hover {
+  border-color: color-mix(in srgb, var(--color-pink) 55%, var(--color-line));
+  background: color-mix(in srgb, var(--color-pink) 12%, white);
+  color: var(--color-text);
+}
+
+.mark-foot {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.74rem;
 }
 
 .state {
