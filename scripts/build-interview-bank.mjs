@@ -30,10 +30,18 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * 为什么是显式列表而不是扫目录：题目编号是在合并后连续重排的（第二份文件的 Q1
  * 会变成 Q231），扫目录会让文件名排序变化直接改变全站题号。新增题库时必须显式
  * 追加在这里，顺带把「题号为什么变了」变成一个需要 review 的动作。
+ *
+ * group 是给前端做筛选分组的：六份题库铺开接近 90 个章节，全都摊成一排 chip
+ * 没法用，所以先按题库分组收一层，再在组内选章节。
  */
-const SOURCES = ['src/data/interview/运维面试八股文-全面版.md', 'src/data/interview/linux-ops.md'].map(
-  (file) => path.join(root, file)
-);
+const SOURCES = [
+  { file: 'src/data/interview/运维面试八股文-全面版.md', group: '通用运维' },
+  { file: 'src/data/interview/linux-ops.md', group: 'Linux 运维' },
+  { file: 'src/data/interview/cicd.md', group: 'CI/CD 与发布' },
+  { file: 'src/data/interview/kubernetes.md', group: 'Kubernetes' },
+  { file: 'src/data/interview/database.md', group: '数据库' },
+  { file: 'src/data/interview/desktop-ops.md', group: '桌面运维' }
+].map((item) => ({ ...item, path: path.join(root, item.file) }));
 const OUTPUT = path.join(root, 'public/data/interview-bank.json');
 
 const DIFFICULTIES = [
@@ -49,6 +57,22 @@ const DIFFICULTIES = [
  */
 const isCheatsheetTitle = (title) => title.includes('速记');
 const APPENDIX_PREFIX = '附：';
+
+/**
+ * 按题库把章节收成一层分组，顺序沿用 SOURCES 的书写顺序而不是章节出现顺序，
+ * 这样新加题库时分组顺序就是 SOURCES 的顺序，不用再单独排一次。
+ */
+function buildGroups(sections) {
+  const order = SOURCES.map((source) => source.group);
+  const groups = [];
+  for (const name of order) {
+    const members = sections.filter((section) => section.group === name);
+    if (members.length > 0) {
+      groups.push({ name, count: members.reduce((sum, item) => sum + item.count, 0), sections: members.length });
+    }
+  }
+  return groups;
+}
 
 /**
  * 把整份文档切成「围栏外」才有语义的行数组。
@@ -184,7 +208,7 @@ async function main() {
   const appendix = [];
 
   for (const source of SOURCES) {
-    const raw = await readFile(source, 'utf8');
+    const raw = await readFile(source.path, 'utf8');
     const sections = splitSections(annotateFences(raw.split(/\r?\n/)));
 
     for (const section of sections) {
@@ -202,6 +226,9 @@ async function main() {
           const entry = {
             slug: slugger.slug(block.heading),
             title: block.heading,
+            // 六份题库的速记小节会重名（「必记参数」「一句话速答」各出现两次），
+            // 带上题库名前端才分得清这是哪一套的速记。
+            group: source.group,
             html: await render(body)
           };
           if (isCheatsheet) cheatsheet.push(entry);
@@ -238,7 +265,7 @@ async function main() {
       }
 
       if (count > 0) {
-        sectionMeta.push({ slug: sectionSlug, name, count, byDifficulty });
+        sectionMeta.push({ slug: sectionSlug, name, group: source.group, count, byDifficulty });
       }
     }
   }
@@ -252,8 +279,9 @@ async function main() {
   });
 
   const bank = {
-    source: SOURCES.map((source) => path.basename(source)).join(' + '),
+    source: SOURCES.map((source) => path.basename(source.path)).join(' + '),
     total: questions.length,
+    groups: buildGroups(sectionMeta),
     difficulties: DIFFICULTIES.map((item) => ({
       key: item.key,
       label: item.label,
