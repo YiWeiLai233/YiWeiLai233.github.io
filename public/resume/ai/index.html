@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>忆丶未来 · AI 应用开发（RAG / Agent）</title>
+<meta name="description" content="忆丶未来的 AI 应用开发方向简历">
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root {
+    --ink: #191c2b;
+    --muted: #5b6178;
+    --line: #e4e5f0;
+    --accent: #5b46d9;
+    --accent-2: #8b5cf6;
+    --accent-soft: #f1eefe;
+    --bg: #ffffff;
+    --page: #f5f4fb;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    background: var(--page);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+  .sheet {
+    max-width: 860px;
+    margin: 0 auto;
+    background: var(--bg);
+    padding: 52px 56px 56px;
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(40, 30, 80, .10);
+  }
+
+  header { border-bottom: 2px solid var(--ink); padding-bottom: 20px; }
+  .name {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    margin: 0 0 6px;
+    line-height: 1.2;
+  }
+  .name small {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0;
+    margin-left: 10px;
+  }
+  .role {
+    display: inline-block;
+    margin: 4px 0 14px;
+    padding: 3px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(100deg, var(--accent), var(--accent-2));
+    border-radius: 999px;
+  }
+  .contact {
+    font-size: 13.5px;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+  }
+  .contact a { color: var(--accent); text-decoration: none; }
+  .contact a:hover { text-decoration: underline; }
+
+  section { margin-top: 34px; }
+  h2 {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    margin: 0 0 14px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--line);
+  }
+  h2::before {
+    content: "";
+    display: inline-block;
+    width: 4px; height: 13px;
+    margin-right: 9px;
+    vertical-align: -1px;
+    background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    border-radius: 2px;
+  }
+  p { margin: 0 0 10px; }
+  .lead { color: #2b3044; }
+
+  .skills { display: grid; gap: 10px; }
+  .skill-row { display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: start; }
+  .skill-row dt {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    padding-top: 2px;
+  }
+  .skill-row dd { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 12.5px;
+    line-height: 1.6;
+    padding: 2px 9px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fbfaff;
+    color: #2b3044;
+    white-space: nowrap;
+  }
+
+  .item { margin-bottom: 20px; }
+  .item:last-child { margin-bottom: 0; }
+  .item-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+  .item-title { font-size: 16px; font-weight: 700; }
+  .item-meta { font-size: 12.5px; color: var(--muted); }
+  .item-sub { font-size: 13px; color: var(--accent); margin-bottom: 6px; }
+  ul.dots { margin: 6px 0 0; padding-left: 18px; }
+  ul.dots li { margin-bottom: 4px; }
+  ul.dots li::marker { color: var(--accent); }
+  .kw { font-weight: 600; }
+
+  .timeline { display: grid; gap: 14px; }
+  .tl-item { display: grid; grid-template-columns: 128px 1fr; gap: 14px; }
+  .tl-when { font-size: 13px; color: var(--muted); padding-top: 1px; }
+  .tl-what b { display: block; font-size: 14.5px; }
+  .tl-what span { font-size: 13.5px; color: var(--muted); }
+
+  .todo {
+    display: block;
+    margin-top: 6px;
+    padding: 7px 12px;
+    font-size: 13px;
+    color: #92400e;
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    border-radius: 0 6px 6px 0;
+  }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  @page { size: A4; margin: 14mm 14mm; }
+  @media print {
+    body { background: #fff; padding: 0; font-size: 10.5pt; line-height: 1.6; }
+    .sheet { max-width: none; margin: 0; padding: 0; border-radius: 0; box-shadow: none; }
+    section { margin-top: 20px; page-break-inside: avoid; }
+    .item { page-break-inside: avoid; }
+    a { color: var(--ink); text-decoration: none; }
+    .todo { display: none; }
+    .role { color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @media (max-width: 640px) {
+    .sheet { padding: 30px 22px 34px; border-radius: 0; }
+    .name { font-size: 26px; }
+    .skill-row, .tl-item { grid-template-columns: 1fr; gap: 4px; }
+    .contact { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<main class="sheet">
+
+  <header>
+    <h1 class="name">忆丶未来 <small>YiWeiLai233</small></h1>
+    <div class="role">AI 应用开发 · RAG / Agent</div>
+    <div class="contact">
+      <span>博客：<a href="https://yiweilai233.github.io" target="_blank" rel="noopener">yiweilai233.github.io</a></span>
+      <span>GitHub：<a href="https://github.com/YiWeiLai233" target="_blank" rel="noopener">github.com/YiWeiLai233</a></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>个人概述</h2>
+    <p class="lead">
+      以 <span class="kw">RAG 与 Agent 工程落地</span> 为主线，把「检索准不准、回答稳不稳、成本可不可控」
+      当作三个必须同时解决的问题。做法上倾向先打通链路再谈调优：
+      文档切分与向量化 → 召回与重排 → 提示词与上下文拼装 → 结构化输出与兜底。
+    </p>
+    <p class="lead">
+      有完整服务端开发经验，因此不只停留在调用接口，能自己把 <span class="kw">向量库、后端服务与前端交互</span>
+      串起来部署上线，也清楚每个环节会在哪里出问题。
+    </p>
+  </section>
+
+  <section>
+    <h2>技术栈</h2>
+    <dl class="skills">
+      <div class="skill-row">
+        <dt>AI 应用</dt>
+        <dd>
+          <span class="tag">RAG 链路设计</span>
+          <span class="tag">文档切分与向量化</span>
+          <span class="tag">Embedding 模型选型</span>
+          <span class="tag">召回与重排</span>
+          <span class="tag">Prompt 工程</span>
+          <span class="tag">Function Calling</span>
+          <span class="tag">Agent 工具编排</span>
+          <span class="tag">结构化输出</span>
+        </dd>
+      </div>
+      <div class="skill-row">
+        <dt>检索与存储</dt>
+        <dd>
+          <span class="tag">Qdrant</span>
+          <span class="tag">向量检索与相似度度量</span>
+          <span class="tag">混合检索（关键词 + 向量）</span>
+          <span class="tag">MySQL</span>
+          <span class="tag">Redis</span>
+          <span class="tag">MinIO</span>
+        </dd>
+      </div>
+      <div class="skill-row">
+        <dt>服务端</dt>
+        <dd>
+          <span class="tag">Python</span>
+          <span class="tag">FastAPI</span>
+          <span class="tag">Java / Spring Boot</span>
+          <span class="tag">异步与流式响应</span>
+          <span class="tag">接口设计与鉴权</span>
+        </dd>
+      </div>
+      <div class="skill-row">
+        <dt>前端</dt>
+        <dd>
+          <span class="tag">Vue 3</span>
+          <span class="tag">TypeScript</span>
+          <span class="tag">流式对话 UI</span>
+          <span class="tag">Astro</span>
+        </dd>
+      </div>
+      <div class="skill-row">
+        <dt>部署</dt>
+        <dd>
+          <span class="tag">Docker / Compose</span>
+          <span class="tag">Nginx 反向代理</span>
+          <span class="tag">HTTPS</span>
+          <span class="tag">Linux</span>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>项目经历</h2>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">易仓 WMS · AI 助手链路</span>
+        <span class="item-meta">FastAPI · Qdrant · Spring Boot · Vue 3</span>
+      </div>
+      <div class="item-sub">仓储系统内置的智能问答与数据查询助手</div>
+      <ul class="dots">
+        <li>设计 <b>知识库问答链路</b>：业务文档与操作手册切分入库，检索后拼装上下文，减少模型对私有业务细节的臆测。</li>
+        <li>用 <b>Qdrant</b> 承载向量检索，按业务域划分 collection，避免不同模块的知识互相污染召回结果。</li>
+        <li>把「自然语言 → 业务查询」做成 <b>Function Calling</b> 流程，严格限定可调用的接口范围，防止模型越权操作数据。</li>
+        <li>处理长对话与 <b>流式返回</b>，在 FastAPI 侧做响应组装，前端逐字渲染，避免用户等待时的空窗。</li>
+      </ul>
+    </div>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">DreamArchive · 梦境记录与 AI 解读</span>
+        <span class="item-meta">Spring Boot · Vue 3 · TypeScript · MySQL · Redis · MinIO</span>
+      </div>
+      <div class="item-sub">面向个人长期使用的记录与解读应用</div>
+      <ul class="dots">
+        <li>把非结构化的文字记录整理成 <b>可检索的结构化数据</b>，为后续的情绪观察与主题聚合提供基础。</li>
+        <li>接入模型做 <b>内容解读</b>，通过固定输出模板与字段校验约束返回格式，避免前端解析失败。</li>
+        <li>使用 <b>Redis 缓存</b> 降低重复生成的开销，把同一内容的多次解读合并为一次调用。</li>
+      </ul>
+    </div>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">未来观测站 · 内容站与知识沉淀</span>
+        <span class="item-meta">Astro · TypeScript · Tailwind · MDX</span>
+      </div>
+      <div class="item-sub">项目档案与技术笔记的长期归档</div>
+      <ul class="dots">
+        <li>用 <b>MDX 结构化写作</b> 记录选型理由与踩坑过程，保证内容可被后续检索复用。</li>
+        <li>梳理站点构建与发布流程，保证内容更新不与线上版本冲突。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>方法论</h2>
+    <ul class="dots">
+      <li><b>先评估再调优</b>：没有召回率与回答质量的基线，就谈不上优化提示词。</li>
+      <li><b>可控优先</b>：能用规则约束的地方不用模型猜，尤其是涉及数据写入的操作。</li>
+      <li><b>成本意识</b>：缓存、上下文裁剪、分级模型使用，都是工程手段而非玄学。</li>
+      <li><b>可观测</b>：记录每次调用的输入摘要、召回片段与耗时，出问题能复现。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>教育经历</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-when">［待填］</div>
+        <div class="tl-what">
+          <b>学校名称 · 专业</b>
+          <span>学历 / 起止时间</span>
+        </div>
+      </div>
+    </div>
+    <span class="todo">待填：学校、专业、学历、起止时间。替换本区块即可。</span>
+  </section>
+
+  <section>
+    <h2>工作经历</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-when">［待填］</div>
+        <div class="tl-what">
+          <b>公司名称 · 职位</b>
+          <span>起止时间 · 负责的系统与产出</span>
+        </div>
+      </div>
+    </div>
+    <span class="todo">待填：公司、职位、在职时间、负责的系统规模与量化产出。</span>
+  </section>
+
+  <footer>
+    <span>忆丶未来 · AI 应用开发方向</span>
+    <span>博客 yiweilai233.github.io</span>
+  </footer>
+
+</main>
+</body>
+</html>

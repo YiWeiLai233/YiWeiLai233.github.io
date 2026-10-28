@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>忆丶未来 · 运维 / SRE 工程师</title>
+<meta name="description" content="忆丶未来的运维 / SRE 方向简历">
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root {
+    --ink: #1a1f2b;
+    --muted: #5b6472;
+    --line: #e2e6ee;
+    --accent: #0f766e;
+    --accent-soft: #eef7f5;
+    --bg: #ffffff;
+    --page: #f4f6fa;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    background: var(--page);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+  .sheet {
+    max-width: 860px;
+    margin: 0 auto;
+    background: var(--bg);
+    padding: 52px 56px 56px;
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(20, 30, 50, .08);
+  }
+
+  /* ---------- 头部 ---------- */
+  header { border-bottom: 2px solid var(--ink); padding-bottom: 20px; }
+  .name {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    margin: 0 0 6px;
+    line-height: 1.2;
+  }
+  .name small {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0;
+    margin-left: 10px;
+  }
+  .role {
+    display: inline-block;
+    margin: 4px 0 14px;
+    padding: 3px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+  }
+  .contact {
+    font-size: 13.5px;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+  }
+  .contact a { color: var(--accent); text-decoration: none; }
+  .contact a:hover { text-decoration: underline; }
+
+  /* ---------- 区块 ---------- */
+  section { margin-top: 34px; }
+  h2 {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    margin: 0 0 14px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--line);
+    text-transform: uppercase;
+  }
+  h2::before {
+    content: "";
+    display: inline-block;
+    width: 4px; height: 13px;
+    margin-right: 9px;
+    vertical-align: -1px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  p { margin: 0 0 10px; }
+  .lead { color: #2b3342; }
+
+  /* ---------- 技能 ---------- */
+  .skills { display: grid; gap: 10px; }
+  .skill-row { display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: start; }
+  .skill-row dt {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    padding-top: 2px;
+  }
+  .skill-row dd { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: 12.5px;
+    line-height: 1.6;
+    padding: 2px 9px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fafbfd;
+    color: #2b3342;
+    white-space: nowrap;
+  }
+
+  /* ---------- 项目 ---------- */
+  .item { margin-bottom: 20px; }
+  .item:last-child { margin-bottom: 0; }
+  .item-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+  .item-title { font-size: 16px; font-weight: 700; }
+  .item-meta { font-size: 12.5px; color: var(--muted); }
+  .item-sub {
+    font-size: 13px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  ul.dots {
+    margin: 6px 0 0;
+    padding-left: 18px;
+  }
+  ul.dots li { margin-bottom: 4px; }
+  ul.dots li::marker { color: var(--accent); }
+  .kw { font-weight: 600; }
+
+  /* ---------- 时间线 ---------- */
+  .timeline { display: grid; gap: 14px; }
+  .tl-item { display: grid; grid-template-columns: 128px 1fr; gap: 14px; }
+  .tl-when { font-size: 13px; color: var(--muted); padding-top: 1px; }
+  .tl-what b { display: block; font-size: 14.5px; }
+  .tl-what span { font-size: 13.5px; color: var(--muted); }
+
+  /* ---------- 占位 ---------- */
+  .todo {
+    display: block;
+    margin-top: 6px;
+    padding: 7px 12px;
+    font-size: 13px;
+    color: #92400e;
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    border-radius: 0 6px 6px 0;
+  }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* ---------- 打印 / 导出 PDF ---------- */
+  @page { size: A4; margin: 14mm 14mm; }
+  @media print {
+    body { background: #fff; padding: 0; font-size: 10.5pt; line-height: 1.6; }
+    .sheet {
+      max-width: none; margin: 0; padding: 0;
+      border-radius: 0; box-shadow: none;
+    }
+    section { margin-top: 20px; page-break-inside: avoid; }
+    .item { page-break-inside: avoid; }
+    a { color: var(--ink); text-decoration: none; }
+    .todo { display: none; }
+  }
+  @media (max-width: 640px) {
+    .sheet { padding: 30px 22px 34px; border-radius: 0; }
+    .name { font-size: 26px; }
+    .skill-row, .tl-item { grid-template-columns: 1fr; gap: 4px; }
+    .contact { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<main class="sheet">
+
+  <header>
+    <h1 class="name">忆丶未来 <small>YiWeiLai233</small></h1>
+    <div class="role">运维 / SRE 工程师</div>
+    <div class="contact">
+      <span>博客：<a href="https://yiweilai233.github.io" target="_blank" rel="noopener">yiweilai233.github.io</a></span>
+      <span>GitHub：<a href="https://github.com/YiWeiLai233" target="_blank" rel="noopener">github.com/YiWeiLai233</a></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>个人概述</h2>
+    <p class="lead">
+      具备服务端开发与线上运维的复合背景，日常在 <span class="kw">Linux 系统管理</span>、
+      <span class="kw">容器化部署</span> 与 <span class="kw">可观测性建设</span> 之间工作。
+      习惯用「先止血、后定位、再复盘」的方式处理线上问题，也愿意把排障过程沉淀成文档和自动化脚本。
+    </p>
+    <p class="lead">
+      技术判断偏务实：优先选择团队能长期维护的方案，对每一次架构取舍都保留可回滚的退路。
+    </p>
+  </section>
+
+  <section>
+    <h2>技术栈</h2>
+    <dl class="skills">
+      <div class="skill-row">
+        <dt>系统与网络</dt>
+        <dd>
+          <span class="tag">Linux（Debian / RHEL）</span>
+          <span class="tag">systemd</span>
+          <span class="tag">TCP/IP 排障</span>
+          <span class="tag">iptables / firewalld</span>
+          <span class="tag">tcpdump</span>
+          <span class="tag">DNS / TLS</span>
+        </dd>
+      </div>
+      <div class="skill-row">
+        <dt>容器与编排</dt>
+        <dd>
+          <span class="tag">Docker</span>
+          <span class="tag">Docker Compose</span>
+          <span class="tag">容器网络与存储</span>
+          <span class="tag">镜像瘦身与多阶段构建</span>
+          <span class="tag">Kubernetes（基础）</span>
+        </dd>
+      </div>
+      <div class="skill-row">
+        <dt>Web 与中间件</dt>
+        <dd>
+          <span class="tag">Nginx 反代与调优</span>
+          <span class="tag">HTTPS / 证书链</span>
+          <span class="tag">MySQL</span>
+          <span class="tag">Redis</span>
+          <span class="tag">MinIO</span>
+          <span class="tag">Qdrant</span>
+        </dd>
+      </div>
+      <div class="skill-row">
+        <dt>可观测性</dt>
+        <dd>
+          <span class="tag">Prometheus / Exporter</span>
+          <span class="tag">Grafana</span>
+          <span class="tag">日志采集与轮转</span>
+          <span class="tag">告警规则设计</span>
+          <span class="tag">链路排查思路</span>
+        </dd>
+      </div>
+      <div class="skill-row">
+        <dt>工程与自动化</dt>
+        <dd>
+          <span class="tag">Shell</span>
+          <span class="tag">Python</span>
+          <span class="tag">Git</span>
+          <span class="tag">GitHub Actions</span>
+          <span class="tag">备份与恢复演练</span>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>项目经历</h2>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">未来观测站 · 个人站点的构建与发布</span>
+        <span class="item-meta">Astro · TypeScript · Tailwind · GitHub Pages</span>
+      </div>
+      <div class="item-sub">独立完成从构建到上线的全流程</div>
+      <ul class="dots">
+        <li>使用静态站点方案搭建内容站，梳理<b>构建产物、缓存策略与发布链路</b>，避免每次更新全量回源。</li>
+        <li>处理多环境配置与静态资源路径问题，验证 <b>HTTPS 证书链、DNS 解析与 CDN 缓存</b> 是否按预期生效。</li>
+        <li>把「线上打不开 / 样式丢失」类问题拆成 DNS → TLS → 缓存 → 资源路径四段定位，形成可复用的排查顺序。</li>
+      </ul>
+    </div>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">易仓 WMS · 多服务本地与服务器部署</span>
+        <span class="item-meta">Docker Compose · Nginx · MySQL · Redis · Spring Boot · Vue 3</span>
+      </div>
+      <div class="item-sub">负责环境搭建、服务编排与依赖治理</div>
+      <ul class="dots">
+        <li>用 <b>Docker Compose</b> 编排数据库、缓存、对象存储与应用服务，统一开发与部署环境，消除「本地能跑线上不行」的差异。</li>
+        <li>通过 <b>Nginx 反向代理</b> 收敛入口，配置前后端分离的转发规则与长连接参数，处理上传体积与超时设置。</li>
+        <li>建立 <b>数据持久化与备份</b> 流程：命名卷存放数据、定期导出并做恢复验证，避免备份只存在于文档里。</li>
+        <li>梳理启动顺序与健康检查，解决依赖服务未就绪导致的启动失败问题。</li>
+      </ul>
+    </div>
+
+    <div class="item">
+      <div class="item-head">
+        <span class="item-title">DreamArchive · 全栈应用的服务端运维</span>
+        <span class="item-meta">Spring Boot · MySQL · Redis · MinIO</span>
+      </div>
+      <div class="item-sub">保障有状态服务的稳定运行</div>
+      <ul class="dots">
+        <li>规划 <b>对象存储（MinIO）与数据库</b> 的容量与访问策略，处理大文件上传与断点续传的场景问题。</li>
+        <li>针对图片归档场景做 <b>缓存与冷热分层</b>，降低热数据回源压力。</li>
+        <li>建立日志规范与关键指标采集点，为后续排障保留证据链。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>能力清单</h2>
+    <ul class="dots">
+      <li><b>故障处理</b>：熟悉 CPU / 内存 / IO / 网络四类资源瓶颈的定位路径，能区分「负载高」与「真慢」。</li>
+      <li><b>容器化</b>：理解 namespace 与 cgroups 的隔离边界，能定位容器内 OOM、退出码 137、端口冲突等常见问题。</li>
+      <li><b>发布与回滚</b>：坚持「可灰度、可监控、可回滚」，变更前先确认退路。</li>
+      <li><b>文档化</b>：习惯把每一次排障过程写成可复用的步骤清单，减少重复劳动。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>教育经历</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-when">［待填］</div>
+        <div class="tl-what">
+          <b>学校名称 · 专业</b>
+          <span>学历 / 起止时间</span>
+        </div>
+      </div>
+    </div>
+    <span class="todo">待填：学校、专业、学历、起止时间。替换本区块即可。</span>
+  </section>
+
+  <section>
+    <h2>工作经历</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-when">［待填］</div>
+        <div class="tl-what">
+          <b>公司名称 · 职位</b>
+          <span>起止时间 · 负责的系统与产出</span>
+        </div>
+      </div>
+    </div>
+    <span class="todo">待填：公司、职位、在职时间、负责的系统规模与量化产出。</span>
+  </section>
+
+  <footer>
+    <span>忆丶未来 · 运维 / SRE 方向</span>
+    <span>博客 yiweilai233.github.io</span>
+  </footer>
+
+</main>
+</body>
+</html>
