@@ -2,7 +2,7 @@
 title: "从零搭一条 CI 流水线，五个报错全指错了方向"
 date: 2026-11-01
 summary: "Ubuntu 26.04 的 Docker 源不存在、PEP 668 报错里不提 venv、CRLF 让 Dockerfile 在 Linux 里静默失效、密码认证早已废弃、空仓库推不上去——每条报错指引的地方都不是根因。"
-tags: ["CI/CD", "Docker", "调试记录"]
+tags: ["CICD", "Docker", "调试记录"]
 category: "项目复盘"
 draft: false
 ---
